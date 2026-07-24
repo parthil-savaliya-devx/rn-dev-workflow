@@ -143,17 +143,9 @@ flowchart TD
 
 <br/>
 
-```mermaid
-flowchart LR
-    P["1 · 📋 Plan"] -->|"✋ you approve"| B["2 · 🔨 Build"]
-    B --> Q["3 · 🧪 QA & Verify"]
-    Q -->|"✋ you skim"| S["4 · 🚢 Ship"]
-    S -->|"✋ you review PR"| C["5 · 🧠 Compound"]
+<div align="center"><img src="./assets/flow.svg" alt="Plan → Build → QA → Ship → Compound, with approval gates" width="880" /></div>
 
-    style P fill:#1f6feb,stroke:#58a6ff,color:#fff
-    style Q fill:#9e6a03,stroke:#e3b341,color:#fff
-    style S fill:#238636,stroke:#3fb950,color:#fff
-```
+<br/>
 
 1. **📋 Plan** — explores your code, pulls Figma specs, asks *all* its questions at once, writes a plan + spec. → **you approve** ✋
 2. **🔨 Build** — tests-first where there's logic, follows the tech-DNA, commits in small slices.
@@ -186,6 +178,38 @@ The setup command from Quick Start step 3. Completely safe — it only **adds** 
 </details>
 
 > Both `/feature` and `/fix` **stop and ask** whenever something's unclear, and build *exactly* to your answer — they never guess. 🙌
+
+<details>
+<summary><b>🎬 What a <code>/feature</code> session actually feels like</b></summary>
+
+<br/>
+
+```text
+you ▸ /feature "add a wishlist screen"
+
+📋 Plan
+   ├─ explores your code, reuses ProductCard + existing query patterns
+   ├─ pulls the Figma node specs (exact spacing, colors → theme tokens)
+   └─ asks 3 questions in one batch ..................... ✋ you approve
+
+🔨 Build
+   ├─ writes failing tests first (store · mapper · hook)
+   ├─ builds the screen on the tech-DNA data pipeline
+   └─ commits in small slices
+
+🧪 QA & Verify
+   ├─ lint ✓   typecheck ✓   tests ✓  (12 passed)
+   ├─ drives the app, screenshots every state .......... ✋ you skim
+   └─ fresh-eyes review pass
+
+🚢 Ship
+   └─ opens a PR with plan + tests + screenshots ........ ✋ you review
+
+🧠 Compound
+   └─ saved 1 gotcha to memory so it's never rediscovered
+```
+
+</details>
 
 ### 🛡️ The guardrails — they run on their own
 
@@ -313,7 +337,7 @@ The hooks and command text default to <code>yarn</code>. Adjust the scripts in y
 Flip the repo to private in GitHub settings — the install commands stay identical; teammates just need repo access and a <code>gh</code> login.
 </details>
 
----
+<div align="center"><img src="./assets/divider.svg" alt="" width="100%" /></div>
 
 <div align="center">
 
