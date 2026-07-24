@@ -1,23 +1,25 @@
 <div align="center">
 
-# 🦾 rn-dev-workflow
+<img src="./assets/banner.svg" alt="rn-dev-workflow — one install, every React Native project" width="840" />
 
-<a href="https://github.com/parthil-savaliya-devx/rn-dev-workflow">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&duration=3200&pause=800&color=58A6FF&center=true&vCenter=true&width=720&height=70&lines=One+install.+Every+React+Native+project.;A+shared+tech-DNA+for+the+whole+team.;Build+with+%2Ffeature.+Fix+with+%2Ffix.+Guardrails+on." alt="Typing banner" />
-</a>
+<br/><br/>
 
-**A drop-in AI development setup for React Native — installed with two commands.**
+**🦾 A drop-in AI development setup for React Native — installed with two commands.**
 
 <p>
-  <img src="https://img.shields.io/badge/React_Native-ready-61DAFB?logo=react&logoColor=white" alt="React Native" />
-  <img src="https://img.shields.io/badge/Claude_Code-plugin-D97757?logo=anthropic&logoColor=white" alt="Claude Code plugin" />
-  <img src="https://img.shields.io/badge/setup-2_commands-brightgreen" alt="2-command setup" />
-  <img src="https://img.shields.io/badge/PRs-welcome-8A2BE2" alt="PRs welcome" />
+  <img src="https://img.shields.io/badge/React_Native-ready-61DAFB?style=for-the-badge&logo=react&logoColor=white&labelColor=0d1117" alt="React Native" />
+  <img src="https://img.shields.io/badge/Claude_Code-plugin-D97757?style=for-the-badge&logo=anthropic&logoColor=white&labelColor=0d1117" alt="Claude Code plugin" />
+  <img src="https://img.shields.io/badge/setup-2_commands-3fb950?style=for-the-badge&labelColor=0d1117" alt="2-command setup" />
+</p>
+<p>
+  <img src="https://img.shields.io/github/stars/parthil-savaliya-devx/rn-dev-workflow?style=for-the-badge&logo=github&color=8957e5&labelColor=0d1117" alt="Stars" />
+  <img src="https://img.shields.io/github/last-commit/parthil-savaliya-devx/rn-dev-workflow?style=for-the-badge&color=1f6feb&labelColor=0d1117" alt="Last commit" />
+  <img src="https://img.shields.io/badge/PRs-welcome-a371f7?style=for-the-badge&labelColor=0d1117" alt="PRs welcome" />
 </p>
 
 <sub>
 
-[Quick Start](#-quick-start) · [Why](#-why-does-this-exist) · [Mental Model](#-how-its-built-the-mental-model) · [What You Get](#-what-you-actually-get) · [Customize](#️-making-it-yours) · [FAQ](#-faq--troubleshooting)
+[⚡ Quick Start](#-quick-start) · [🤔 Why](#-why-does-this-exist) · [🧩 Mental Model](#-how-its-built-the-mental-model) · [📚 What You Get](#-what-you-actually-get) · [✏️ Customize](#️-making-it-yours) · [❓ FAQ](#-faq--troubleshooting)
 
 </sub>
 
@@ -36,6 +38,15 @@ It's a private [Claude Code](https://claude.com/claude-code) **plugin marketplac
 
 > [!TIP]
 > **New here?** Skip straight to [🚀 Quick Start](#-quick-start). Everything else is reference for later.
+
+### ⚡ TL;DR — the whole thing in 4 lines
+
+```bash
+/plugin marketplace add parthil-savaliya-devx/rn-dev-workflow   # 1. add      (once per machine)
+/plugin install rn-workflow@rn-dev-workflow                     # 2. install  (once per machine)
+/init-dna                                                       # 3. scaffold (once per project)
+/feature "add a wishlist screen"                                # 4. build 🎉
+```
 
 ---
 
