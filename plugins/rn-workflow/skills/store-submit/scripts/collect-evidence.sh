@@ -3,13 +3,13 @@
 # Generic: works on any React Native repo. Missing pieces print "n/a", never fail.
 #
 # Usage: collect-evidence.sh [repo-root] [--platform ios|android|both]
-#        default: repo-root=.  platform=ios
+#        default: repo-root=.  platform=both
 set -uo pipefail
 
-ROOT="."; PLATFORM="ios"
+ROOT="."; PLATFORM="both"
 while [ $# -gt 0 ]; do
   case "$1" in
-    --platform) PLATFORM="${2:-ios}"; shift 2 ;;
+    --platform) PLATFORM="${2:-both}"; shift 2 ;;
     --platform=*) PLATFORM="${1#*=}"; shift ;;
     *) ROOT="$1"; shift ;;
   esac

@@ -47,7 +47,7 @@ It's a private [Claude Code](https://claude.com/claude-code) **plugin marketplac
 /plugin install rn-workflow@rn-dev-workflow                     # 2. install  (once per machine)
 /init-dna                                                       # 3. scaffold (once per project)
 /feature "add a wishlist screen"                                # 4. build 🎉
-/store-submit                                                   # 5. ship 🛫
+/store-submit:both                                              # 5. ship 🛫
 ```
 
 ---
@@ -233,7 +233,7 @@ You never call these; they just happen in the background:
 
 - **`figma-to-ui`** — turn a Figma node into React Native UI that follows your tech-DNA. Give it a Figma link + a screenshot.
 - **`graphify`** — build a searchable knowledge graph of your codebase, so *"how does X work?"* is a fast query, not a grep marathon.
-- **`store-submit`** — verify an App Store Connect *or* Play Console submission against your actual code. → [full section below](#-shipping--store-submit)
+- **`store-submit`** — verify an App Store Connect *and* Play Console submission against your actual code, via `/store-submit:ios`, `:android` or `:both`. → [full section below](#-shipping--store-submit)
 
 ### 🧬 The tech-DNA
 
@@ -329,10 +329,19 @@ It never answers a submission question from your marketing copy, a plausible def
 ### 🚀 Usage
 
 ```bash
-/store-submit                  # App Store (default)
-/store-submit android          # Play Console
-/store-submit both             # diff the two declarations against each other
+/store-submit:both             # default — iOS to completion, then Android
+/store-submit:ios              # App Store Connect only
+/store-submit:android          # Play Console only
 ```
+
+> [!IMPORTANT]
+> **`both` is sequenced, not interleaved.** iOS finishes entirely — every section verified,
+> open items listed — then it asks before starting Android, and closes by diffing the two
+> declarations against each other.
+>
+> Why: the two consoles ask different questions in different words, and answering them side by
+> side is exactly how one fact ends up declared one way on one store and another way on the
+> other. Finish one, then carry its **evidence** — never its answers — into the next.
 
 Then hand it screenshots as it asks. It works the console cheapest-rejection-first:
 
@@ -344,10 +353,10 @@ Then hand it screenshots as it asks. It works the console cheapest-rejection-fir
 Send the first two together — those carry the real blockers.
 
 > [!TIP]
-> **`both` is worth running even if you only ship one store today.** A data type declared on
-> one console and not the other means one of them is factually wrong. Play's *Shared* flag and
-> its Fraud-prevention / Account-management purposes have no Apple equivalent, so the skill
-> reports genuine disagreements and ignores taxonomy differences.
+> **The diff is worth it even if you only ship one store today.** A data type declared on one
+> console and not the other means one of them is factually wrong. Play's *Shared* flag and its
+> Fraud-prevention / Account-management purposes have no Apple equivalent, so the skill reports
+> genuine disagreements and ignores taxonomy differences.
 
 <details>
 <summary><b>🔍 What the evidence pass collects — automatically, before you show it anything</b></summary><br/>
@@ -473,7 +482,7 @@ rn-dev-workflow/
 │   └── marketplace.json          # declares this marketplace + the plugin
 └── plugins/rn-workflow/
     ├── .claude-plugin/plugin.json  # the plugin manifest
-    ├── commands/                   # /feature, /fix, /init-dna
+    ├── commands/                   # /feature, /fix, /init-dna, /store-submit:{ios,android,both}
     ├── hooks/                      # the 4 guardrails + hooks.json
     ├── skills/                     # figma-to-ui, graphify, store-submit
     └── scaffold/                   # ← what /init-dna copies into your project

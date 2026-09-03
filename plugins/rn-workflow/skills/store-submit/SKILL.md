@@ -1,6 +1,6 @@
 ---
 name: store-submit
-description: Review an app store submission against the app's own codebase. Use when the user wants their App Store Connect or Play Console submission checked, says they will share store-console screenshots for verification, asks where to start with a submission, or hits an "Unable to Add for Review" error. Also for App Privacy, Data safety, Age Rating, description-accuracy and review-notes questions. Accepts a platform argument — ios (default), android, or both.
+description: Review an app store submission against the app's own codebase. Use when the user wants their App Store Connect or Play Console submission checked, says they will share store-console screenshots for verification, asks where to start with a submission, or hits an "Unable to Add for Review" error. Also for App Privacy, Data safety, Age Rating, description-accuracy and review-notes questions. Covers both stores by default — iOS first, then Android; scope it with /store-submit:ios or /store-submit:android.
 ---
 
 # Store submission review
@@ -12,12 +12,29 @@ Never answer a submission question from the app's marketing, a `docs/` note, or 
 plausible default. Every answer is derived from the repo, and when a doc disagrees with
 the code, the code wins and you say the doc is stale.
 
-## Platform
+## Platform — default is BOTH, iOS first
 
-Read the argument: `ios` (default), `android`, or `both`. If the user names a store
-instead — App Store, App Store Connect, TestFlight → `ios`; Play, Play Console, Data
-safety, AAB → `android`. Ambiguous and the repo has both folders? Ask which store they
-are submitting to; the field sets are different and the answers do not copy across.
+| Invocation | Scope |
+| --- | --- |
+| `/store-submit:ios` | App Store Connect only |
+| `/store-submit:android` | Play Console only |
+| `/store-submit:both`, or no scope given | **both, sequenced: iOS to completion, then Android** |
+
+A named store scopes it too: App Store / App Store Connect / TestFlight → iOS. Play /
+Play Console / Data safety / AAB → Android. Only one platform folder in the repo? Use that
+one.
+
+**When doing both, finish iOS entirely before starting Android.** Complete every App
+Store Connect section, say so, list what is still open on it, and ask before moving on.
+Then run the Android pass, and close by diffing the two declarations.
+
+Sequenced rather than interleaved for a reason: the two consoles ask different questions
+in different words, and answering them side by side is exactly how one fact ends up
+declared one way on one store and another way on the other. Finish one, then carry its
+**evidence** — never its answers — into the next.
+
+The repo read (Step 2) is done once and reused. The evidence dump and the field maps are
+per platform.
 
 ## Step 1 — Review the app first, and report the baseline
 
