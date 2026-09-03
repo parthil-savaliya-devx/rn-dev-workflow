@@ -20,7 +20,7 @@
 
 <sub>
 
-[⚡ Quick Start](#-quick-start) · [🤔 Why](#-why-does-this-exist) · [🧩 Mental Model](#-how-its-built-the-mental-model) · [📚 What You Get](#-what-you-actually-get) · [✏️ Customize](#️-making-it-yours) · [❓ FAQ](#-faq--troubleshooting)
+[⚡ Quick Start](#-quick-start) · [🤔 Why](#-why-does-this-exist) · [🧩 Mental Model](#-how-its-built-the-mental-model) · [📚 What You Get](#-what-you-actually-get) · [🛫 Shipping](#-shipping--store-submit) · [✏️ Customize](#️-making-it-yours) · [❓ FAQ](#-faq--troubleshooting)
 
 </sub>
 
@@ -36,6 +36,7 @@ It's a private [Claude Code](https://claude.com/claude-code) **plugin marketplac
 - ⚙️ Two guided **workflows** — `/feature` to build something end-to-end, `/fix` to squash a bug — each with checkpoints where **you** stay in control.
 - 🛡️ **Guardrails** that run automatically — auto-lint on save, tests must pass before a task is *done*, and a confirm-prompt before touching risky files.
 - 🎨 A **Figma → UI** skill and a 🕸️ **codebase knowledge-graph** skill.
+- 🛫 A **submission reviewer** — `/store-submit` checks your App Store / Play listing against what the code actually does, before a reviewer does it for you.
 
 > [!TIP]
 > **New here?** Skip straight to [🚀 Quick Start](#-quick-start). Everything else is reference for later.
@@ -242,6 +243,14 @@ The heart of it all — `docs/tech-dna.md`, a genome of copy-me patterns coverin
 ---
 
 ## 🛫 Shipping — `/store-submit`
+
+<div align="center">
+
+**`/store-submit`** · **`:ios`** · **`:android`**
+
+<sub>12 checks · dashboard vs binary · report-only</sub>
+
+</div>
 
 Building is one problem. **Getting past store review is another** — and it fails for a reason no
 test catches: *the dashboard claims one thing, the binary does another.* Nobody diffs them,

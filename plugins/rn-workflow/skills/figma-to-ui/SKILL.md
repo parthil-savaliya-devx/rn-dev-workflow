@@ -1,7 +1,6 @@
 ---
 name: figma-to-ui
 description: "Convert a Figma node into React Native UI that follows this repo's conventions (theme tokens, useThemeStyles, SectionRegistry, mapper-as-firewall, mandatory tests). Use when given a Figma node id / Dev Mode link plus a screenshot, for a new screen, a rebuild of an existing screen, a single new section, or a standalone component. Works with or without a ready backend contract."
-trigger: /figma-to-ui
 ---
 
 # /figma-to-ui
