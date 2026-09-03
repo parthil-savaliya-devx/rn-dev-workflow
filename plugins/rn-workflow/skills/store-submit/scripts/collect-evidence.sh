@@ -44,13 +44,26 @@ for x in d.get('NSPrivacyCollectedDataTypes',[]):
 PY
 else echo "n/a"; fi
 
-say "AD / ATTRIBUTION SDKs  (any hit => tracking is likely Yes)"
-grep -icE 'appsflyer|branch|adjust|react-native-fbsdk|singular|kochava|tenjin|google-mobile-ads|admob' package.json 2>/dev/null | sed 's/^/matches: /'
-grep -oE '"@?[a-z0-9@/._-]*(firebase|analytics|smartech|clevertap|moengage|segment|mixpanel|amplitude|posthog|sentry|bugsnag|datadog|onesignal|braze|iterable)[a-z0-9@/._-]*"' package.json 2>/dev/null | sort -u
-[ -f ios/Podfile ] && { grep -q 'RNFirebaseAnalyticsWithoutAdIdSupport' ios/Podfile \
-  && echo "ad-id support: DISABLED (no IDFA read)" \
-  || echo "ad-id support: ENABLED -> binary can read IDFA"; }
-[ -f ios/Podfile ] && grep -oE 'setup_permissions\(\[[^]]*\]' ios/Podfile
+say "DEPENDENCIES  (classify these yourself - do not rely on a vendor list)"
+if [ -f package.json ]; then
+python3 -c "
+import json
+d=json.load(open('package.json')).get('dependencies',{})
+print(f'{len(d)} dependencies:')
+[print('  ',k) for k in sorted(d)]
+"
+cat <<'TXT'
+  ^ Identify any that do analytics, marketing automation, attribution or ads.
+    An attribution/ad SDK makes 'used for tracking' a Yes. A marketing-automation
+    SDK earns the Marketing purpose on whatever data types it receives.
+TXT
+else echo "n/a"; fi
+if [ -f ios/Podfile ]; then
+  grep -q 'WithoutAdIdSupport' ios/Podfile \
+    && echo "  ad-id support: DISABLED (no IDFA read)" \
+    || echo "  ad-id support: not disabled -> an analytics SDK may be able to read the IDFA"
+  grep -oE "setup_permissions\(\[[^]]*\]" ios/Podfile
+fi
 
 say "WEBVIEWS  ('unrestricted web access' = No only if every one is guarded)"
 grep -rlE '<WebView|react-native-webview' src 2>/dev/null | grep -v __tests__ | while read -r f; do
