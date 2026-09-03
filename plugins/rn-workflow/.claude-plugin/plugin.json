@@ -1,7 +1,7 @@
 {
   "name": "rn-workflow",
   "displayName": "RN Dev Workflow",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "React Native AI dev workflow: /feature + /fix commands, guardrail hooks, figma-to-ui + graphify + store-submit skills, and /init-dna scaffolding for the tech-DNA docs.",
   "author": {
     "name": "parthil-savaliya-devx"
@@ -12,7 +12,8 @@
     "tech-dna",
     "hooks",
     "figma",
-    "app-store"
+    "app-store",
+    "play-store"
   ],
   "hooks": "./hooks/hooks.json"
 }

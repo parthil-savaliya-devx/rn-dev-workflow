@@ -2,7 +2,13 @@
 
 Every one of these is mechanically detectable from the evidence dump. Ordered by cost.
 
-## 1. ATT key vs tracking answer — HARD BLOCK
+**Platform:** 1, 2, 3, 4, 11 and 12 are iOS-shaped. **5, 7, 8, 9 and 10 are app-truth
+questions and apply to Play unchanged** — a feature that does not exist is missing from
+both listings, and a deletion claim with no endpoint is false on both stores.
+Play adds its own: the deletion URL must feature the steps, `AD_ID` implies an
+advertising purpose, and the *Shared* flag has no Apple equivalent. See `play-fields.md`.
+
+## 1. ATT key vs tracking answer — HARD BLOCK *(iOS)*
 
 `NSUserTrackingUsageDescription` present in Info.plist + App Privacy declaring no
 tracking = **App Store Connect refuses "Add for Review"**:
@@ -24,19 +30,19 @@ campaigns perform" is evidence against a no-tracking answer even when ASC accept
 Must be identical or the uploaded build cannot attach to the version record. Also
 check `CURRENT_PROJECT_VERSION` against TestFlight — a re-used build number is refused.
 
-## 3. Device family vs required screenshots
+## 3. Device family vs required screenshots *(iOS)*
 
 `TARGETED_DEVICE_FAMILY = 1` → iPad and Watch screenshot slots are correctly empty.
 `1,2` → iPad screenshots are **mandatory**. One 6.5" iPhone set covers every iPhone;
 6.5"→6.9" is a ~4% upscale, so extra sizes are not worth chasing.
 
-## 4. Privacy manifest vs App Privacy answers
+## 4. Privacy manifest vs App Privacy answers *(iOS)*
 
 `PrivacyInfo.xcprivacy` collected types should match the ASC type list, with the same
 purposes and linked flags. Apple does not hard-block a mismatch, but the manifest is
 public via the privacy report and the divergence is unexplainable in review.
 
-## 5. Description vs feature flags and inert controls
+## 5. Description vs feature flags and inert controls *(both)*
 
 The one that actually rejects. For every description bullet, find the code that
 delivers it. A feature behind a default-off flag, or whose control only
@@ -47,31 +53,31 @@ flag hides the control entirely; a hidden feature the copy promises is indefensi
 
 Must not be the privacy policy, the marketing site, or a 404. Guideline 1.5. `curl` it.
 
-## 7. UGC declared vs moderation present
+## 7. UGC declared vs moderation present *(both)*
 
 UGC = Yes in Age Rating pulls in Guideline 1.2: filtering, reporting, blocking,
 published contact. Grep for report/flag/block mechanisms. If absent, the position
 rests entirely on platform pre-moderation — verify it is actually switched on, and say
 which Age Rating answers depend on it.
 
-## 8. WebView guards vs "unrestricted web access"
+## 8. WebView guards vs "unrestricted web access" *(both)*
 
 Answer No only if **every** rendered WebView has `onShouldStartLoadWithRequest` or
 `originWhitelist`. An unguarded WebView is a browser, and Yes forces 17+/18+.
 
-## 9. Account deletion claim vs backend reality
+## 9. Account deletion claim vs backend reality *(both)*
 
 An app offering account deletion must actually delete server-side (5.1.1(v)). A local
 teardown that reports success is disproved by re-login with the same credential. No
 dashboard field fixes this.
 
-## 10. Keywords vs catalogue
+## 10. Keywords vs catalogue *(both)*
 
 Probe each product term against the store's own `/search?q=`. Zero results = irrelevant
 metadata (2.3.7) and wasted characters. Don't test `/collections/<slug>` — many stores
 404 every such path, which proves nothing.
 
-## 11. Encryption key vs export compliance
+## 11. Encryption key vs export compliance *(iOS)*
 
 `ITSAppUsesNonExemptEncryption = false` means ASC should never prompt. If it prompts,
 the key is not being read and the build config is wrong.

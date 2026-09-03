@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/React_Native-ready-61DAFB?style=for-the-badge&logo=react&logoColor=white&labelColor=0d1117" alt="React Native" />
   <img src="https://img.shields.io/badge/Claude_Code-plugin-D97757?style=for-the-badge&logo=anthropic&logoColor=white&labelColor=0d1117" alt="Claude Code plugin" />
   <img src="https://img.shields.io/badge/setup-2_commands-3fb950?style=for-the-badge&labelColor=0d1117" alt="2-command setup" />
-  <img src="https://img.shields.io/badge/App_Store-12_checks-0d96f6?style=for-the-badge&logo=appstore&logoColor=white&labelColor=0d1117" alt="12 App Store submission checks" />
+  <img src="https://img.shields.io/badge/submission-12_checks-0d96f6?style=for-the-badge&logo=appstore&logoColor=white&labelColor=0d1117" alt="12 submission checks" />
 </p>
 <p>
   <img src="https://img.shields.io/github/stars/parthil-savaliya-devx/rn-dev-workflow?style=for-the-badge&logo=github&color=8957e5&labelColor=0d1117" alt="Stars" />
@@ -233,7 +233,7 @@ You never call these; they just happen in the background:
 
 - **`figma-to-ui`** — turn a Figma node into React Native UI that follows your tech-DNA. Give it a Figma link + a screenshot.
 - **`graphify`** — build a searchable knowledge graph of your codebase, so *"how does X work?"* is a fast query, not a grep marathon.
-- **`store-submit`** — verify an App Store Connect submission against your actual code. → [full section below](#-shipping--store-submit)
+- **`store-submit`** — verify an App Store Connect *or* Play Console submission against your actual code. → [full section below](#-shipping--store-submit)
 
 ### 🧬 The tech-DNA
 
@@ -243,7 +243,7 @@ The heart of it all — `docs/tech-dna.md`, a genome of copy-me patterns coverin
 
 ## 🛫 Shipping — `/store-submit`
 
-Building is one problem. **Getting past App Review is another** — and it fails for a reason no
+Building is one problem. **Getting past store review is another** — and it fails for a reason no
 test catches: *the dashboard claims one thing, the binary does another.* Nobody diffs them,
 because nobody can hold both in their head.
 
@@ -318,7 +318,10 @@ It never answers a submission question from your marketing copy, a plausible def
 | 11 | Encryption key ⇄ export compliance |
 | 12 | Permission prompts ⇄ declared data types |
 
-> Each one is a documented App Review rejection cause — and each is derivable from code. 🎯
+> Each one is a documented store rejection cause — and each is derivable from code. 🎯
+>
+> **5, 7, 8, 9, 10** are app-truth questions and apply to **both** stores unchanged. A feature
+> that doesn't exist is missing from both listings.
 
 </td></tr>
 </table>
@@ -326,24 +329,42 @@ It never answers a submission question from your marketing copy, a plausible def
 ### 🚀 Usage
 
 ```bash
-/store-submit          # from inside any RN project
+/store-submit                  # App Store (default)
+/store-submit android          # Play Console
+/store-submit both             # diff the two declarations against each other
 ```
 
-Then hand it screenshots as it asks. It works through the dashboard cheapest-rejection-first:
-**App Review Info → App Privacy → App Information → Version info → Pricing → Build.**
+Then hand it screenshots as it asks. It works the console cheapest-rejection-first:
+
+| | Order |
+| --- | --- |
+| 🍎 **iOS** | App Review Info → App Privacy → App Information + Age Rating → Version info → Pricing → Build |
+| 🤖 **Android** | App access → Data safety → Content rating → Store listing → Advertising ID → Countries → Release |
+
+Send the first two together — those carry the real blockers.
+
+> [!TIP]
+> **`both` is worth running even if you only ship one store today.** A data type declared on
+> one console and not the other means one of them is factually wrong. Play's *Shared* flag and
+> its Fraud-prevention / Account-management purposes have no Apple equivalent, so the skill
+> reports genuine disagreements and ignores taxonomy differences.
 
 <details>
 <summary><b>🔍 What the evidence pass collects — automatically, before you show it anything</b></summary><br/>
 
-Nine sections of mechanical ground truth, all fixed-location so it works on any RN repo:
+Mechanical ground truth, all fixed-location so it works on any RN repo. Platform-gated —
+`--platform ios|android|both`:
 
 | | |
 | --- | --- |
-| **Identity** | bundle id, `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION` |
-| **Device support** | `TARGETED_DEVICE_FAMILY`, Catalyst, visionOS |
-| **Permission prompts** | every `NS*UsageDescription` — with its full string |
-| **Encryption / ATT** | `ITSAppUsesNonExemptEncryption`, and the check-1 warning |
-| **Privacy manifest** | parsed — types, purposes, linked + tracking flags |
+| 🍎 **Identity** | bundle id, `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION` |
+| 🍎 **Device support** | `TARGETED_DEVICE_FAMILY`, Catalyst, visionOS |
+| 🍎 **Permission prompts** | every `NS*UsageDescription` — with its full string |
+| 🍎 **Encryption / ATT** | `ITSAppUsesNonExemptEncryption`, and the check-1 warning |
+| 🍎 **Privacy manifest** | parsed — types, purposes, linked + tracking flags |
+| 🤖 **Android identity** | `applicationId`, `versionCode`, `versionName` |
+| 🤖 **Android permissions** | every manifest permission, plus whether `AD_ID` is declared |
+| 🤖 **Signing** | Play re-signs, so SHA-restricted services need *both* fingerprints |
 | **Dependencies** | the full list — *you* classify what does analytics/ads, so no vendor list to go stale |
 | **WebViews** | which ones are navigation-guarded, which are open |
 | **Live URLs** | actually `curl`s them — a policy behind a password gate still returns 200 |
