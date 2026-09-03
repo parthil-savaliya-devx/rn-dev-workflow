@@ -259,24 +259,35 @@ because nobody can hold both in their head.
 
 ### 🔬 How it runs
 
+It reads your app and **reports the baseline back to you before asking for a single
+screenshot** — then tells you which section to send first, and verifies each batch as it
+arrives.
+
 ```mermaid
 flowchart LR
-    E["🔍 EVIDENCE<br/>plist · pbxproj<br/>privacy manifest"] --> R["📖 READ THE REPO<br/>flag defaults · inert<br/>controls · auth path"]
-    R --> S["📸 YOUR SCREENSHOTS<br/>section by section"]
-    S --> V["⚖️ 12 CHECKS<br/>dashboard vs binary"]
-    V --> O["📋 EXACT PASTE VALUES<br/>+ an audit report"]
+    A["🔬 REVIEW THE APP<br/>identity · routes · permissions<br/>privacy manifest"] --> B["📖 READ THE REPO<br/>flag defaults · inert controls<br/>real auth path"]
+    B --> C["🧭 WHERE TO START<br/>cheapest rejection first"]
+    C --> D["📸 YOUR SCREENSHOTS<br/>batch by batch"]
+    D --> E["⚖️ 12 CHECKS<br/>dashboard vs binary"]
+    E --> F["📋 EXACT PASTE VALUES<br/>+ an audit report"]
 
-    style E fill:#1f6feb,stroke:#58a6ff,color:#fff
-    style R fill:#238636,stroke:#3fb950,color:#fff
-    style V fill:#9e6a03,stroke:#d29922,color:#fff
-    style O fill:#8957e5,stroke:#a371f7,color:#fff
+    style A fill:#1f6feb,stroke:#58a6ff,color:#fff
+    style B fill:#238636,stroke:#3fb950,color:#fff
+    style C fill:#0d96f6,stroke:#58a6ff,color:#fff
+    style E fill:#9e6a03,stroke:#d29922,color:#fff
+    style F fill:#8957e5,stroke:#a371f7,color:#fff
 ```
 
-It never answers a submission question from your marketing copy. Every answer is derived from
-code — and when a `docs/` note disagrees with the code, **the code wins and you get told the doc
-is stale.**
+> [!IMPORTANT]
+> **Report only.** It never edits your project. It tells you what's wrong, why, and the exact
+> value to paste — you stay in control of every change.
+
+It never answers a submission question from your marketing copy, a plausible default, or a
+`docs/` note. Every answer is derived from code — and when a doc disagrees with the code,
+**the code wins and you get told the doc is stale.** 📄❌
 
 ### ⚖️ The 12 checks
+
 
 <table>
 <tr><td width="50%" valign="top">
@@ -333,7 +344,7 @@ Ten sections of mechanical ground truth, all fixed-location so it works on any R
 | **Permission prompts** | every `NS*UsageDescription` — with its full string |
 | **Encryption / ATT** | `ITSAppUsesNonExemptEncryption`, and the check-1 warning |
 | **Privacy manifest** | parsed — types, purposes, linked + tracking flags |
-| **Ad / attribution SDKs** | AppsFlyer, Branch, Adjust, Meta, AdMob… and IDFA support |
+| **Dependencies** | the full list — *you* classify what does analytics/ads, so no vendor list to go stale |
 | **WebViews** | which ones are navigation-guarded, which are open |
 | **Android** | `applicationId`, `versionCode`, `versionName` |
 | **Live URLs** | actually `curl`s them — a policy behind a password gate still returns 200 |
@@ -351,11 +362,32 @@ So the script only collects what has a fixed location. Everything project-shaped
 *instruction to explore the repo*. That's why it works on your other apps and not just the one
 it was written against.
 
+Same reasoning killed the hardcoded analytics-SDK vendor list. A fixed list of vendor names goes
+stale and can never catch an SDK that doesn't exist yet — so the script prints your dependencies
+and the reader classifies them. Nothing to maintain.
+
 Three real bugs were caught this way, all silent, all found by running it rather than reading it:
 a plist picker that grabbed a notification extension and reported *"ATT absent"* — the exact
 opposite of the truth, on the one check Apple hard-blocks; a WebView scan that matched any file
 containing the word; and a relative script path that resolved against the app instead of the
 plugin. **Run new checks. Don't just review them.** 🧪
+
+</details>
+
+<details>
+<summary><b>🌐 It checks live infrastructure too — not just code</b></summary><br/>
+
+A field can hold a URL that looks perfect and is quietly broken. So:
+
+- **`curl` every URL.** A privacy policy behind a store password gate still returns `200`.
+- **Probe keywords against the store's own search** before accepting a keyword list. A term with
+  zero products is irrelevant metadata (2.3.7) and wasted characters.
+- **Check MX and SPF on any support email domain.** No MX record — or `v=spf1 -all` — means the
+  address cannot receive mail, no matter how official it looks. This one reversed a
+  recommendation mid-review: the "official-looking" address was undeliverable and the original
+  one was fine.
+- **Distrust a probe that returns the same answer for every input.** If every URL pattern 404s,
+  the probe is broken, not the answer. Say so and find another method. 🕵️
 
 </details>
 
