@@ -250,12 +250,12 @@ because nobody can hold both in their head.
 `/store-submit` reads your actual codebase and checks the submission against it.
 
 > [!WARNING]
-> **This is not hypothetical.** A real submission was refused by App Store Connect with:
+> **This one is a hard block, not a warning.** App Store Connect refuses *Add for Review* with:
 > *"Your app contains `NSUserTrackingUsageDescription`, indicating that it may request permission
 > to track users. To submit for review, update your App Privacy response…"*
 >
-> One grep of `Info.plist`, one dashboard answer. Mechanically detectable — and it cost a
-> submission attempt because nobody thought to compare them. That's **check #1**.
+> One grep of `Info.plist`, one dashboard answer. Entirely mechanical — and invisible until you
+> try to submit. That's **check #1**.
 
 ### 🔬 How it runs
 
@@ -318,7 +318,7 @@ It never answers a submission question from your marketing copy, a plausible def
 | 11 | Encryption key ⇄ export compliance |
 | 12 | Permission prompts ⇄ declared data types |
 
-> Every finding in the submission that produced this skill came from that list. 🎯
+> Each one is a documented App Review rejection cause — and each is derivable from code. 🎯
 
 </td></tr>
 </table>
@@ -359,18 +359,17 @@ puts them. A hardcoded grep that finds nothing looks **identical** to nothing to
 false negative, the worst possible failure for a submission tool.
 
 So the script only collects what has a fixed location. Everything project-shaped is an
-*instruction to explore the repo*. That's why it works on your other apps and not just the one
-it was written against.
+*instruction to explore the repo*. That's what makes it work on any RN app rather than one
+particular stack.
 
 Same reasoning killed the hardcoded analytics-SDK vendor list. A fixed list of vendor names goes
 stale and can never catch an SDK that doesn't exist yet — so the script prints your dependencies
 and the reader classifies them. Nothing to maintain.
 
-Three real bugs were caught this way, all silent, all found by running it rather than reading it:
-a plist picker that grabbed a notification extension and reported *"ATT absent"* — the exact
-opposite of the truth, on the one check Apple hard-blocks; a WebView scan that matched any file
-containing the word; and a relative script path that resolved against the app instead of the
-plugin. **Run new checks. Don't just review them.** 🧪
+The failure mode to watch for when adding a check: one that reports a clean result because it
+looked in the wrong place. A plist picker that grabs a notification extension reports every
+permission absent. A grep for a filename rather than an import matches unrelated files. Both
+look like good news. **Run new checks against a real repo. Don't just review them.** 🧪
 
 </details>
 
@@ -383,9 +382,7 @@ A field can hold a URL that looks perfect and is quietly broken. So:
 - **Probe keywords against the store's own search** before accepting a keyword list. A term with
   zero products is irrelevant metadata (2.3.7) and wasted characters.
 - **Check MX and SPF on any support email domain.** No MX record — or `v=spf1 -all` — means the
-  address cannot receive mail, no matter how official it looks. This one reversed a
-  recommendation mid-review: the "official-looking" address was undeliverable and the original
-  one was fine.
+  address cannot receive mail, no matter how official it looks.
 - **Distrust a probe that returns the same answer for every input.** If every URL pattern 404s,
   the probe is broken, not the answer. Say so and find another method. 🕵️
 
