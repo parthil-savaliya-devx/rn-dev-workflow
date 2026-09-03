@@ -10,6 +10,7 @@
   <img src="https://img.shields.io/badge/React_Native-ready-61DAFB?style=for-the-badge&logo=react&logoColor=white&labelColor=0d1117" alt="React Native" />
   <img src="https://img.shields.io/badge/Claude_Code-plugin-D97757?style=for-the-badge&logo=anthropic&logoColor=white&labelColor=0d1117" alt="Claude Code plugin" />
   <img src="https://img.shields.io/badge/setup-2_commands-3fb950?style=for-the-badge&labelColor=0d1117" alt="2-command setup" />
+  <img src="https://img.shields.io/badge/App_Store-12_checks-0d96f6?style=for-the-badge&logo=appstore&logoColor=white&labelColor=0d1117" alt="12 App Store submission checks" />
 </p>
 <p>
   <img src="https://img.shields.io/github/stars/parthil-savaliya-devx/rn-dev-workflow?style=for-the-badge&logo=github&color=8957e5&labelColor=0d1117" alt="Stars" />
@@ -39,13 +40,14 @@ It's a private [Claude Code](https://claude.com/claude-code) **plugin marketplac
 > [!TIP]
 > **New here?** Skip straight to [🚀 Quick Start](#-quick-start). Everything else is reference for later.
 
-### ⚡ TL;DR — the whole thing in 4 lines
+### ⚡ TL;DR — the whole thing in 5 lines
 
 ```bash
 /plugin marketplace add parthil-savaliya-devx/rn-dev-workflow   # 1. add      (once per machine)
 /plugin install rn-workflow@rn-dev-workflow                     # 2. install  (once per machine)
 /init-dna                                                       # 3. scaffold (once per project)
 /feature "add a wishlist screen"                                # 4. build 🎉
+/store-submit                                                   # 5. ship 🛫
 ```
 
 ---
@@ -231,10 +233,146 @@ You never call these; they just happen in the background:
 
 - **`figma-to-ui`** — turn a Figma node into React Native UI that follows your tech-DNA. Give it a Figma link + a screenshot.
 - **`graphify`** — build a searchable knowledge graph of your codebase, so *"how does X work?"* is a fast query, not a grep marathon.
+- **`store-submit`** — verify an App Store Connect submission against your actual code. → [full section below](#-shipping--store-submit)
 
 ### 🧬 The tech-DNA
 
 The heart of it all — `docs/tech-dna.md`, a genome of copy-me patterns covering the data pipeline, state, styling, navigation, testing, and error handling. Ships as a **uniform baseline** (identical everywhere) with `<FILL IN>` slots for your specifics. Devs extend it as the project grows — that's expected, not cheating. 🌱
+
+---
+
+## 🛫 Shipping — `/store-submit`
+
+Building is one problem. **Getting past App Review is another** — and it fails for a reason no
+test catches: *the dashboard claims one thing, the binary does another.* Nobody diffs them,
+because nobody can hold both in their head.
+
+`/store-submit` reads your actual codebase and checks the submission against it.
+
+> [!WARNING]
+> **This is not hypothetical.** A real submission was refused by App Store Connect with:
+> *"Your app contains `NSUserTrackingUsageDescription`, indicating that it may request permission
+> to track users. To submit for review, update your App Privacy response…"*
+>
+> One grep of `Info.plist`, one dashboard answer. Mechanically detectable — and it cost a
+> submission attempt because nobody thought to compare them. That's **check #1**.
+
+### 🔬 How it runs
+
+```mermaid
+flowchart LR
+    E["🔍 EVIDENCE<br/>plist · pbxproj<br/>privacy manifest"] --> R["📖 READ THE REPO<br/>flag defaults · inert<br/>controls · auth path"]
+    R --> S["📸 YOUR SCREENSHOTS<br/>section by section"]
+    S --> V["⚖️ 12 CHECKS<br/>dashboard vs binary"]
+    V --> O["📋 EXACT PASTE VALUES<br/>+ an audit report"]
+
+    style E fill:#1f6feb,stroke:#58a6ff,color:#fff
+    style R fill:#238636,stroke:#3fb950,color:#fff
+    style V fill:#9e6a03,stroke:#d29922,color:#fff
+    style O fill:#8957e5,stroke:#a371f7,color:#fff
+```
+
+It never answers a submission question from your marketing copy. Every answer is derived from
+code — and when a `docs/` note disagrees with the code, **the code wins and you get told the doc
+is stale.**
+
+### ⚖️ The 12 checks
+
+<table>
+<tr><td width="50%" valign="top">
+
+**🛑 Hard block**
+| # | Check |
+|---|-------|
+| 1 | ATT key ⇄ tracking answer |
+
+**💸 Costs a review cycle (~1 week each)**
+| # | Check |
+|---|-------|
+| 2 | ASC version ⇄ `MARKETING_VERSION` |
+| 3 | Device family ⇄ required screenshots |
+| 4 | Privacy manifest ⇄ App Privacy answers |
+| 5 | Description ⇄ feature flags + inert controls |
+| 6 | Support URL isn't the privacy policy |
+
+</td><td width="50%" valign="top">
+
+**💸 …continued**
+| # | Check |
+|---|-------|
+| 7 | UGC declared ⇄ moderation present |
+| 8 | WebView guards ⇄ "unrestricted web access" |
+| 9 | Deletion claim ⇄ backend reality |
+| 10 | Keywords ⇄ live catalogue |
+| 11 | Encryption key ⇄ export compliance |
+| 12 | Permission prompts ⇄ declared data types |
+
+> Every finding in the submission that produced this skill came from that list. 🎯
+
+</td></tr>
+</table>
+
+### 🚀 Usage
+
+```bash
+/store-submit          # from inside any RN project
+```
+
+Then hand it screenshots as it asks. It works through the dashboard cheapest-rejection-first:
+**App Review Info → App Privacy → App Information → Version info → Pricing → Build.**
+
+<details>
+<summary><b>🔍 What the evidence pass collects — automatically, before you show it anything</b></summary><br/>
+
+Ten sections of mechanical ground truth, all fixed-location so it works on any RN repo:
+
+| | |
+| --- | --- |
+| **Identity** | bundle id, `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION` |
+| **Device support** | `TARGETED_DEVICE_FAMILY`, Catalyst, visionOS |
+| **Permission prompts** | every `NS*UsageDescription` — with its full string |
+| **Encryption / ATT** | `ITSAppUsesNonExemptEncryption`, and the check-1 warning |
+| **Privacy manifest** | parsed — types, purposes, linked + tracking flags |
+| **Ad / attribution SDKs** | AppsFlyer, Branch, Adjust, Meta, AdMob… and IDFA support |
+| **WebViews** | which ones are navigation-guarded, which are open |
+| **Android** | `applicationId`, `versionCode`, `versionName` |
+| **Live URLs** | actually `curl`s them — a policy behind a password gate still returns 200 |
+
+</details>
+
+<details>
+<summary><b>🧠 Why the project-specific bits are <i>read</i>, not grepped</b></summary><br/>
+
+Feature-flag defaults, inert-control markers and the real auth path live wherever each project
+puts them. A hardcoded grep that finds nothing looks **identical** to nothing to find — a silent
+false negative, the worst possible failure for a submission tool.
+
+So the script only collects what has a fixed location. Everything project-shaped is an
+*instruction to explore the repo*. That's why it works on your other apps and not just the one
+it was written against.
+
+Three real bugs were caught this way, all silent, all found by running it rather than reading it:
+a plist picker that grabbed a notification extension and reported *"ATT absent"* — the exact
+opposite of the truth, on the one check Apple hard-blocks; a WebView scan that matched any file
+containing the word; and a relative script path that resolved against the app instead of the
+plugin. **Run new checks. Don't just review them.** 🧪
+
+</details>
+
+<details>
+<summary><b>📋 What it hands back</b></summary><br/>
+
+- **Exact values to paste** — keywords with character counts, the corrected description, review
+  notes with a sign-in path that actually exists in your code
+- **Verdict per field**, with the evidence line that settled it
+- **A markdown report** — the paper trail for *"why did we answer No to tracking?"* six months later
+
+</details>
+
+> [!NOTE]
+> `references/contradictions.md` is a **living file**. It encodes what Apple enforced on a real
+> submission — and Apple changes the rules without notice. When someone hits a new blocker, it
+> earns a numbered entry. That's the part that compounds. 📈
 
 ---
 
@@ -288,7 +426,7 @@ rn-dev-workflow/
     ├── .claude-plugin/plugin.json  # the plugin manifest
     ├── commands/                   # /feature, /fix, /init-dna
     ├── hooks/                      # the 4 guardrails + hooks.json
-    ├── skills/                     # figma-to-ui, graphify
+    ├── skills/                     # figma-to-ui, graphify, store-submit
     └── scaffold/                   # ← what /init-dna copies into your project
         ├── CLAUDE.md
         ├── settings.snippet.json
@@ -330,6 +468,23 @@ They need <code>yarn lint</code> / <code>yarn typecheck</code> / <code>yarn test
 <details>
 <summary><b>Can I use npm/pnpm instead of yarn?</b></summary><br/>
 The hooks and command text default to <code>yarn</code>. Adjust the scripts in your project (or the hooks) to match your package manager.
+</details>
+
+<details>
+<summary><b>Does <code>/store-submit</code> put anything in my app repo?</b></summary><br/>
+
+**No.** It *reads* your codebase to derive answers, but it lives in `~/.claude/plugins/` — zero
+files added to your project, nothing to commit or gitignore. Submission is a per-app, occasional
+job, so the tooling shouldn't ship inside every app.
+
+</details>
+
+<details>
+<summary><b>Do I need to re-install to get <code>/store-submit</code>?</b></summary><br/>
+
+No — it's a skill inside the `rn-workflow` plugin you already have. One
+`/plugin marketplace update rn-dev-workflow` and it's there.
+
 </details>
 
 <details>
