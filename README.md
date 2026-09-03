@@ -47,7 +47,7 @@ It's a private [Claude Code](https://claude.com/claude-code) **plugin marketplac
 /plugin install rn-workflow@rn-dev-workflow                     # 2. install  (once per machine)
 /init-dna                                                       # 3. scaffold (once per project)
 /feature "add a wishlist screen"                                # 4. build 🎉
-/store-submit:both                                              # 5. ship 🛫
+/store-submit                                                   # 5. ship 🛫
 ```
 
 ---
@@ -233,7 +233,7 @@ You never call these; they just happen in the background:
 
 - **`figma-to-ui`** — turn a Figma node into React Native UI that follows your tech-DNA. Give it a Figma link + a screenshot.
 - **`graphify`** — build a searchable knowledge graph of your codebase, so *"how does X work?"* is a fast query, not a grep marathon.
-- **`store-submit`** — verify an App Store Connect *and* Play Console submission against your actual code, via `/store-submit:ios`, `:android` or `:both`. → [full section below](#-shipping--store-submit)
+- **`store-submit`** — verify an App Store Connect *and* Play Console submission against your actual code, — `/store-submit` for both, or scope it with `:ios` / `:android`. → [full section below](#-shipping--store-submit)
 
 ### 🧬 The tech-DNA
 
@@ -329,13 +329,13 @@ It never answers a submission question from your marketing copy, a plausible def
 ### 🚀 Usage
 
 ```bash
-/store-submit:both             # default — iOS to completion, then Android
+/store-submit                  # both — iOS to completion, then Android
 /store-submit:ios              # App Store Connect only
 /store-submit:android          # Play Console only
 ```
 
 > [!IMPORTANT]
-> **`both` is sequenced, not interleaved.** iOS finishes entirely — every section verified,
+> **The default run is sequenced, not interleaved.** iOS finishes entirely — every section verified,
 > open items listed — then it asks before starting Android, and closes by diffing the two
 > declarations against each other.
 >
@@ -482,7 +482,7 @@ rn-dev-workflow/
 │   └── marketplace.json          # declares this marketplace + the plugin
 └── plugins/rn-workflow/
     ├── .claude-plugin/plugin.json  # the plugin manifest
-    ├── commands/                   # /feature, /fix, /init-dna, /store-submit:{ios,android,both}
+    ├── commands/                   # /feature, /fix, /init-dna, /store-submit(:ios|:android)
     ├── hooks/                      # the 4 guardrails + hooks.json
     ├── skills/                     # figma-to-ui, graphify, store-submit
     └── scaffold/                   # ← what /init-dna copies into your project

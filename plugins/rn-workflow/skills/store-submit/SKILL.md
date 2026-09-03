@@ -16,9 +16,9 @@ the code, the code wins and you say the doc is stale.
 
 | Invocation | Scope |
 | --- | --- |
+| `/store-submit` | **both, sequenced: iOS to completion, then Android** — the default |
 | `/store-submit:ios` | App Store Connect only |
 | `/store-submit:android` | Play Console only |
-| `/store-submit:both`, or no scope given | **both, sequenced: iOS to completion, then Android** |
 
 A named store scopes it too: App Store / App Store Connect / TestFlight → iOS. Play /
 Play Console / Data safety / AAB → Android. Only one platform folder in the repo? Use that

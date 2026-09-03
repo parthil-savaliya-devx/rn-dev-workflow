@@ -1,9 +1,13 @@
 ---
-description: 'Review both store submissions against the codebase — iOS first, then Android.'
+description: 'Review the store submissions against the codebase — iOS first, then Android. Scope with /store-submit:ios or /store-submit:android.'
 ---
 
 Run the **`store-submit` skill** for **both platforms, strictly in sequence: iOS first,
 then Android.**
+
+This is the default entry point. To scope a run to one store, the user runs
+`/store-submit:ios` or `/store-submit:android` instead. If only one platform folder
+exists in the repo, do that one and say so rather than reporting the other as missing.
 
 ## Order is not optional
 

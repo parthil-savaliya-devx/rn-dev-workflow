@@ -1,8 +1,8 @@
 {
   "name": "rn-workflow",
   "displayName": "RN Dev Workflow",
-  "version": "0.4.0",
-  "description": "React Native AI dev workflow: /feature + /fix commands, /store-submit:{ios,android,both} submission review, guardrail hooks, figma-to-ui + graphify skills, and /init-dna scaffolding for the tech-DNA docs.",
+  "version": "0.5.0",
+  "description": "React Native AI dev workflow: /feature + /fix commands, /store-submit submission review (iOS + Android), guardrail hooks, figma-to-ui + graphify skills, and /init-dna scaffolding for the tech-DNA docs.",
   "author": {
     "name": "parthil-savaliya-devx"
   },
