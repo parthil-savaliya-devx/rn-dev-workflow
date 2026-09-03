@@ -46,7 +46,7 @@ else echo "n/a"; fi
 
 say "AD / ATTRIBUTION SDKs  (any hit => tracking is likely Yes)"
 grep -icE 'appsflyer|branch|adjust|react-native-fbsdk|singular|kochava|tenjin|google-mobile-ads|admob' package.json 2>/dev/null | sed 's/^/matches: /'
-grep -oE '"@?[a-z0-9@/._-]*(firebase|smartech|clevertap|moengage|segment|mixpanel|amplitude)[a-z0-9@/._-]*"' package.json 2>/dev/null | sort -u
+grep -oE '"@?[a-z0-9@/._-]*(firebase|analytics|smartech|clevertap|moengage|segment|mixpanel|amplitude|posthog|sentry|bugsnag|datadog|onesignal|braze|iterable)[a-z0-9@/._-]*"' package.json 2>/dev/null | sort -u
 [ -f ios/Podfile ] && { grep -q 'RNFirebaseAnalyticsWithoutAdIdSupport' ios/Podfile \
   && echo "ad-id support: DISABLED (no IDFA read)" \
   || echo "ad-id support: ENABLED -> binary can read IDFA"; }

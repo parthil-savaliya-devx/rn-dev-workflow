@@ -76,8 +76,8 @@ derived from evidence. Use it rather than inventing an answer.
   if the doc is wrong — that finding is worth more than the answer.
 - **A default-off feature flag cannot be advertised.** Grep the flag defaults; any
   feature behind a `false` default must not appear in the description.
-- **An inert control is a described feature that does not exist.** Sweep for
-  `comingSoon` / TODO call sites and cross-check them against description bullets.
+- **An inert control is a described feature that does not exist.** Find the project's own
+  no-op marker (step 2), sweep for it, and cross-check the hits against description bullets.
 - **Probe live URLs.** Never trust a URL in a field. `curl` it. A privacy policy behind
   a store password gate reads 200 and is still a rejection.
 - **Probe keyword claims** against the live catalogue (the store's own `/search?q=`)

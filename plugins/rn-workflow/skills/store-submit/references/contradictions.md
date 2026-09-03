@@ -39,8 +39,8 @@ public via the privacy report and the divergence is unexplainable in review.
 ## 5. Description vs feature flags and inert controls
 
 The one that actually rejects. For every description bullet, find the code that
-delivers it. A feature behind a `default: () => false` flag, or whose control only
-fires a `comingSoon` toast, **is not in the app** — Guideline 2.3.1. Check whether the
+delivers it. A feature behind a default-off flag, or whose control only
+fires the project's no-op toast, **is not in the app** — Guideline 2.3.1. Check whether the
 flag hides the control entirely; a hidden feature the copy promises is indefensible.
 
 ## 6. Support URL
