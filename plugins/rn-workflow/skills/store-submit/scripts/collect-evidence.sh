@@ -79,9 +79,6 @@ indistinguishable from nothing to find. Derive them by READING the repo. See
 SKILL.md step 3.
 TXT
 
-say "ANDROID"
-grep -oE '(applicationId|namespace) "[^"]*"|versionCode [0-9]+|versionName "[^"]*"' android/app/build.gradle 2>/dev/null | sort -u || echo "n/a"
-
 say "LIVE URLS  (Support URL must not be the privacy policy)"
 for p in "${STORE_URLS:-}"; do :; done
 for u in ${STORE_URLS:-}; do

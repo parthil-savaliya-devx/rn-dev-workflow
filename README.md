@@ -335,7 +335,7 @@ Then hand it screenshots as it asks. It works through the dashboard cheapest-rej
 <details>
 <summary><b>🔍 What the evidence pass collects — automatically, before you show it anything</b></summary><br/>
 
-Ten sections of mechanical ground truth, all fixed-location so it works on any RN repo:
+Nine sections of mechanical ground truth, all fixed-location so it works on any RN repo:
 
 | | |
 | --- | --- |
@@ -346,7 +346,6 @@ Ten sections of mechanical ground truth, all fixed-location so it works on any R
 | **Privacy manifest** | parsed — types, purposes, linked + tracking flags |
 | **Dependencies** | the full list — *you* classify what does analytics/ads, so no vendor list to go stale |
 | **WebViews** | which ones are navigation-guarded, which are open |
-| **Android** | `applicationId`, `versionCode`, `versionName` |
 | **Live URLs** | actually `curl`s them — a policy behind a password gate still returns 200 |
 
 </details>
