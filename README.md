@@ -233,7 +233,7 @@ You never call these; they just happen in the background:
 
 - **`figma-to-ui`** — turn a Figma node into React Native UI that follows your tech-DNA. Give it a Figma link + a screenshot.
 - **`graphify`** — build a searchable knowledge graph of your codebase, so *"how does X work?"* is a fast query, not a grep marathon.
-- **`store-submit`** — verify an App Store Connect *and* Play Console submission against your actual code, — `/store-submit` for both, or scope it with `:ios` / `:android`. → [full section below](#-shipping--store-submit)
+- **`store-submit`** — verify an App Store Connect *and* Play Console submission against your actual code. `/store-submit` does both; scope it with `:ios` / `:android`. → [full section below](#-shipping--store-submit)
 
 ### 🧬 The tech-DNA
 
