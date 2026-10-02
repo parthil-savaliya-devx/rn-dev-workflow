@@ -2,13 +2,13 @@
 description: 'Feature workflow — Plan → Build → QA & Verify → Ship → Compound, in one session.'
 ---
 
-You are building a feature end-to-end in this session. Three human gates only: **plan approval (A)**, **QA-report skim (B)**, **PR review (C)**.
+You are building a feature end-to-end in this session. Three human gates only: **plan approval (A)**, **QA report + change approval (B) — the commit gate: nothing is committed before it**, **PR review (C)**.
 
-**Read first, every time:** `docs/tech-dna.md` (canonical patterns — all code copies these), `CLAUDE.md` (hard rules + subsystem map), and any relevant [ADRs](docs/decisions/README.md). Project commands are `yarn lint`, `yarn typecheck`, `yarn test`, `yarn check:env` — never hardcode others; if this project's scripts differ, read `package.json` and use those.
+**Read first, every time:** `docs/tech-dna.md` (canonical patterns — all code copies these; §29 indexes the silent failures), `CLAUDE.md` (hard rules, silent traps + subsystem map), and any relevant [ADRs](docs/decisions/README.md). Project commands are `yarn lint --max-warnings=0`, `yarn typecheck`, `yarn test`, `yarn check:env` — never hardcode others; if this project's scripts differ, read `package.json` and use those.
 
 ## PHASE 1 — PLAN (in-session)
 
-1. Explore the codebase read-only: reusable components/hooks/services, navigation types, stores, existing mappers/schemas. If a `graphify-out/` graph exists, prefer `graphify query "<question>"` over raw grep. Identify what to reuse before proposing anything new.
+1. Explore the codebase read-only: reusable components (`components/core/`, `components/common/` first)/hooks/services, navigation types, stores, existing mappers/schemas. If a `graphify-out/` graph exists, prefer `graphify query "<question>"` over raw grep. Identify what to reuse before proposing anything new.
 2. **Design source (if the feature has Figma):** use the `figma-to-ui` skill — `get_metadata` to find each node, then `get_design_context` for **every** screen/state involved. Extract exact spacing, colours→theme tokens, typography, icon sizes, and record the **node id per state** now (fail fast, not at QA time). Screenshots are for comprehension only (tech-dna — Figma → UI).
 3. **Contract:** if the feature needs backend data, get the per-screen contract (query/endpoint + sample response + types) up front. No data path is designed without it. Never invent a shape.
 4. Ask **ALL** clarifying questions in **one batched round** (use a multi-question prompt). Build only per the answers — never guess (hard rule).
@@ -21,11 +21,11 @@ You are building a feature end-to-end in this session. Three human gates only: *
 
 0. Pre-read `docs/tech-dna.md` AND your persistent memory (recalled `<system-reminder>` context + relevant `feedback`/`project` memories). All code follows the tech-DNA canonical patterns (data pipeline, sections, stores, styling, naming, testIDs). **A pattern with no tech-DNA precedent is designed at Gate A and added to `docs/tech-dna.md` in the same PR** (Evolving the DNA) — never improvised.
 1. **Logic first, TDD** where there's logic (utils, hooks, stores, mappers, schemas): write the failing test in `__tests__/` mirroring `src/` → confirm red → implement → green. Mock at the boundary (`@/services`), leave real schema+mapper in place. Never modify a test to force green.
-2. **Data path** (if any): query text in `src/graphql/queries/` → `fetch<X>` using the boundary fetcher with a `getConfig('USE_MOCK')` branch → Zod schema in `src/schemas/` → mapper firewall in `src/mappers/` (`type→fn` map, never `switch`) → view-model type → presentation component. Wire the hook via a shared query-options factory; add pull-to-refresh.
-3. **UI:** theme tokens only (hex-only, `spacing.*`/`typography.*`, weight-by-family, `BaseText`). Build each screen/state, then converge visually against the Figma node values — never reverse-engineer measurements after the fact.
+2. **Data path** (if any): query text in `src/graphql/queries/` → `fetch<X>` using the boundary fetcher (timeout, auth-by-default, redacted errors) with a `getConfig('USE_MOCK')` branch that loads its fixture lazily → Zod schema in `src/schemas/` declaring only the fields the screen reads → mapper firewall in `src/mappers/` (`type→fn` map, never `switch`) → view-model type → presentation component. Request-side shaping is a pure `build<X>Request` util. Wire the hook via a shared query-options factory with the retry predicate; add pull-to-refresh. Probe the live contract before relying on any field (tech-dna — Contracts & request building).
+3. **UI:** theme tokens only (hex-only, `spacing.*`/`typography.*`, weight-by-family, `BaseText`); the shared `Pressable`, image component (`renderWidthDp`), `BottomSheet` shell and Reanimated for motion; WebP for bundled rasters. Reuse project components before any React Native primitive, and place new ones per tech-dna — Component structure & reuse (core/ · common/ · <area>/; the screen folder holds only the screen). Media is sized from screen width + `aspectRatio`, never hardcoded; every bottom element respects the safe-area inset (edge-to-edge, 3-button nav); built to stay smooth on 2–4 GB RAM phones (tech-dna — Edge-to-edge & system bars, Performance). Build each screen/state, then converge visually against the Figma node values — never reverse-engineer measurements after the fact.
 4. **Add a `testID`** to every interactive and landmark element **as you build** — QA and any future e2e depend on them.
-5. **Persisted store?** `skipHydration:true` + a `rehydrate()` line in `App.tsx`'s `Promise.all` (footgun — tech-dna — State).
-6. Checkpoint commit per task/slice (conventional commits; do NOT push). Do not enter Phase 3 with red tests or missing testIDs.
+5. **Persisted store?** `skipHydration:true` + a `rehydrate()` line in `App.tsx`'s `Promise.all` + an explicit `version` + an allow-list `partialize`; never a token (footgun — tech-dna — State).
+6. **Do not commit.** The whole change stays uncommitted until Gate B approves it (tech-dna — Human verification precedes every commit). Do not enter Phase 3 with red tests or missing testIDs.
 
 ## PHASE 3 — QA & VERIFY (feature-scoped — never a full-app pass)
 
@@ -41,18 +41,18 @@ Scope = exactly what Phase 2 built: its screens, states, components, and the nav
    | forms | valid → success, invalid → validation UI |
    | async states | loading / error / empty via a mocked boundary |
    Edge cases: zero/one/many items, missing optional data (no image, null fields), over-limit input, double-tap submit.
-2. **Green bar:** `yarn lint && yarn typecheck && yarn test && yarn check:env` — all must pass.
-3. **Drive the real app** with the `verify` (and `run`) skill if available: launch via the correct alias (`yarn ios:dev` / `yarn android:dev`), exercise the feature's happy path + one edge, and **screenshot each designed state**. Compare each shot against its Figma node values from the spec; fix mismatches, re-shoot. Stop when it matches or improvement stalls — don't iterate blindly (after 2 failed attempts at the same fix, step back and re-approach).
+2. **Green bar:** `yarn lint --max-warnings=0 && yarn typecheck && yarn test && yarn check:env` — all must pass (the flag matches CI: a lint warning fails the build).
+3. **Drive the real app** with the `verify` (and `run`) skill if available: launch via the correct alias (`yarn ios:dev` / `yarn android:dev`), exercise the feature's happy path + one edge, and **screenshot each designed state**. Cover **Android 3-button navigation** for any screen with a bottom bar/sheet, do a quick **screen-reader pass (TalkBack / VoiceOver) and a largest-system-font check** on new screens, and check scrolling, transitions and memory on a **low-end Android (2–4 GB RAM) release build** where the feature has lists, media or animation. Compare each shot against its Figma node values from the spec; fix mismatches, re-shoot. Stop when it matches or improvement stalls — don't iterate blindly (after 2 failed attempts at the same fix, step back and re-approach).
 4. **Device e2e (Appium/Maestro/etc.) — always ASK, run only on an explicit yes, scoped to THIS feature.** e2e is never part of the mandatory bar (step 2 is) and never runs automatically. The ask is conditional on a spec existing for this feature:
    - **If a spec exists for this feature** (e.g. `e2e/specs/<feature>.spec.js`) → you MUST surface the question at QA: ask the user _"Run the e2e pass for `<feature>`? (default: No)"_. Run **only on an explicit yes**, and **only that spec** — never the whole suite. First-launch flows may need reset disabled.
    - **If no spec exists for this feature** → don't run anything; note it, and offer to scaffold one from the project's spec template. Do not fall back to the full suite.
 5. **Fresh-eyes review:** dispatch a code-review agent on the diff **if one is installed** (e.g. `pr-review-toolkit:code-reviewer` or `feature-dev:code-reviewer`); otherwise do a deliberate fresh-eyes self-review pass against `docs/tech-dna.md`. Fix findings in this session.
-6. ▸ **GATE B:** present the QA report — tests added + pass status, `lint/typecheck/test/check:env` results, screenshot paths per state, whether the feature's e2e spec was offered/run/skipped, review findings addressed. User skims.
+6. **Docs in the same change set** (tech-dna — Documentation): a new decision → an ADR; a new subsystem → `docs/architecture/`; a new env key → the environments doc + `.env.example`; a new pattern → `docs/tech-dna.md`; a new silent failure → a line in `CLAUDE.md` → Traps. Reconcile the plan checkboxes + spec `Status`.
+7. ▸ **GATE B — the commit gate:** present the QA report — tests added + pass status, `lint/typecheck/test/check:env` results, screenshot paths per state, whether the feature's e2e spec was offered/run/skipped, review findings addressed — **and the uncommitted change set**: files changed, what was verified and how, what is still open. **Wait for explicit approval.** Fold any requested changes into the same uncommitted set and present again. On approval, commit (conventional commits — logical commits are fine, no fixup chains; do NOT push yet).
 
 ## PHASE 4 — SHIP
 
-- Update `docs/` in the same PR (tech-dna — Documentation): a new decision → an ADR; a new subsystem → `docs/architecture/`; a new env key → the environments doc + `.env.example`; a new pattern → `docs/tech-dna.md`. Reconcile the plan checkboxes + spec `Status` to what shipped.
-- Open the PR (use `commit-commands:commit-push-pr` or `gh`) with the evidence bundle: plan + spec links, test results, QA screenshots, review findings addressed. End the PR body with the repo's required trailer (see `CLAUDE.md`).
+- Only after Gate B approval: push the branch and open the PR (use `commit-commands:commit-push-pr` or `gh`) with a short **Why** (the user/business reason for the feature) and the evidence bundle: plan + spec links, test results, QA screenshots, review findings addressed. End the PR body with the repo's required trailer (see `CLAUDE.md`).
 - ▸ **GATE C:** user reviews the PR. Never merge without it.
 
 ## PHASE 5 — COMPOUND (2 minutes)
@@ -61,4 +61,4 @@ Scope = exactly what Phase 2 built: its screens, states, components, and the nav
 - A mistake that recurred or is easy to repeat → propose a **hookify** rule (`/hookify`) so it's prevented mechanically next time.
 - A new canonical pattern used here → confirm it's in `docs/tech-dna.md` with a copy-me snippet (should already be there from Phase 2).
 
-**Hard rules:** ANY ambiguity → STOP and ask the human (batched); implement only after they clarify, and exactly per the clarification — never guess and build · one QA scope = this feature only · every code path tested at the boundary · every designed state screenshotted · docs in the PR or it didn't happen · after 2 failed attempts at the same fix, re-approach rather than iterate blindly · commit per slice, never push without the ship gate.
+**Hard rules:** ANY ambiguity → STOP and ask the human (batched); implement only after they clarify, and exactly per the clarification — never guess and build · one QA scope = this feature only · every code path tested at the boundary · every designed state screenshotted · docs in the PR or it didn't happen · after 2 failed attempts at the same fix, re-approach rather than iterate blindly · nothing is committed before Gate B approval, and nothing is pushed before it.

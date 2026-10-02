@@ -10,8 +10,8 @@ The machinery (commands, hooks, skills) is installed from the **`rn-workflow` pl
 
 | Piece | Source | Role |
 | ----- | ------ | ---- |
-| **Tech DNA** | `docs/tech-dna.md` (owned here) | The coding genome — canonical, copy-me patterns + a Forbidden list. Read before writing any code. |
-| **Hard Rules** | `CLAUDE.md` (owned here) | Scannable non-negotiable rules + the subsystem map; links the DNA. |
+| **Tech DNA** | `docs/tech-dna.md` (owned here) | The coding genome — canonical, copy-me patterns, a Forbidden list (§16) and a silent-failure index (§29). Read before writing any code. |
+| **Hard Rules + Traps** | `CLAUDE.md` (owned here) | Scannable non-negotiable rules, the silent-failure traps, and the subsystem map; links the DNA. |
 | **`/feature`** | `rn-workflow` plugin | End-to-end feature workflow: Plan → Build → QA & Verify → Ship → Compound, with three human gates. |
 | **`/fix`** | `rn-workflow` plugin | Bugfix workflow: repro-first → minimal diff → verify → PR. No feature ceremony. |
 | **Hooks** | `rn-workflow` plugin | Automatic guardrails the harness runs around tool calls (below). |
@@ -30,14 +30,14 @@ Every feature and every bugfix is written by **copying the patterns in `docs/tec
 Run `/feature "<name>"` to build a feature in one session:
 
 1. **Plan** — explore read-only, pull Figma node specs (via the `figma-to-ui` skill), get the contract, ask all clarifying questions in one batch, and persist two docs: a task plan at `docs/superpowers/plans/YYYY-MM-DD-<feature>.md` and a rebuild-grade spec at `docs/superpowers/specs/YYYY-MM-DD-<feature>-design.md`. **▸ Gate A: plan approval.**
-2. **Build** — logic-first TDD; the data path through the pipeline; token-only UI; a `testID` on every interactive/landmark element; commit per slice.
-3. **QA & Verify** (feature-scoped) — Jest+RTL branch/interaction tests, a green `yarn lint && yarn typecheck && yarn test && yarn check:env`, driving the real app with a screenshot per designed state, and a fresh-eyes review. Device e2e is ask-first, scoped to the one feature spec, never automatic. **▸ Gate B: QA-report skim.**
-4. **Ship** — docs updated in the same PR, PR opened with the evidence bundle. **▸ Gate C: PR review.**
+2. **Build** — logic-first TDD; the data path through the pipeline; token-only UI; a `testID` on every interactive/landmark element. **Nothing is committed** — the change stays uncommitted until Gate B.
+3. **QA & Verify** (feature-scoped) — Jest+RTL branch/interaction tests, a green `yarn lint --max-warnings=0 && yarn typecheck && yarn test && yarn check:env`, driving the real app with a screenshot per designed state, a fresh-eyes review, and the docs diff. Device e2e is ask-first, scoped to the one feature spec, never automatic. **▸ Gate B: QA report + change approval — the commit gate.** The change is committed only after you approve it.
+4. **Ship** — after Gate B: push and open the PR with the evidence bundle. **▸ Gate C: PR review.**
 5. **Compound** — non-obvious discoveries → memory; recurring mistakes → a `/hookify` rule; new patterns → the DNA.
 
 ### `/fix` — repro-first, minimal diff
 
-Run `/fix "<bug>"`: write a **failing test that captures the bug first** (no product-code edits before a repro exists), state the root cause with `file:line` + blast radius, make the smallest change that turns it green, sweep for sibling occurrences, verify with the green bar (lint + typecheck + jest), and open a PR whose body carries the root-cause paragraph + repro test name. The repro test stays in the suite forever.
+Run `/fix "<bug>"`: write a **failing test that captures the bug first** (no product-code edits before a repro exists), state the root cause with `file:line` + blast radius, make the smallest change that turns it green, sweep for sibling occurrences, verify with the green bar (lint `--max-warnings=0` + typecheck + jest), **present the uncommitted fix and commit only after you approve it**, then open a PR whose body carries the root-cause paragraph + repro test name. The repro test stays in the suite forever.
 
 **Both commands stop and ask on any ambiguity** and build only to the clarification — never guess-and-build.
 
@@ -62,12 +62,12 @@ A rule is enforced at the earliest layer that can catch it:
 2. **ESLint / TypeScript** — most style/type rules; `post-edit.sh` applies eslint per edit.
 3. **The Stop hook** — changed-file tests must be green to finish.
 4. **husky pre-commit** — `lint-staged` (eslint + prettier) on staged files (if configured).
-5. **Human gates** — plan approval, QA skim, PR review.
+5. **Human gates** — plan approval, QA report + commit approval (nothing is committed before a human approves it — tech-dna §17a), PR review.
 
 ## For a new developer
 
 1. Read `docs/tech-dna.md` once — it's the shortest path to writing code that fits.
-2. Skim `CLAUDE.md` → Hard Rules and the subsystem map.
+2. Skim `CLAUDE.md` → Hard Rules, **Traps** (the failures that are silent) and the subsystem map.
 3. Build features with `/feature`, fix bugs with `/fix` — the commands walk the gates and enforce the patterns.
 4. Let the hooks run; if one blocks you, it's pointing at a real lint/test failure — fix it, don't route around it.
 5. When you discover something non-obvious, put it in memory; when a mistake could recur, add a `/hookify` rule. The workflow is meant to compound.

@@ -151,9 +151,9 @@ flowchart TD
 <br/>
 
 1. **📋 Plan** — explores your code, pulls Figma specs, asks *all* its questions at once, writes a plan + spec. → **you approve** ✋
-2. **🔨 Build** — tests-first where there's logic, follows the tech-DNA, commits in small slices.
-3. **🧪 QA & Verify** — lint + types + tests, drives the real app, screenshots each state. → **you skim** ✋
-4. **🚢 Ship** — updates docs, opens the PR. → **you review** ✋
+2. **🔨 Build** — tests-first where there's logic, follows the tech-DNA. **Nothing is committed yet.**
+3. **🧪 QA & Verify** — lint (`--max-warnings=0`) + types + tests, drives the real app, screenshots each state. → **you approve the change — only then is it committed** ✋
+4. **🚢 Ship** — pushes and opens the PR (docs included). → **you review** ✋
 5. **🧠 Compound** — saves what it learned so it's never rediscovered.
 
 </details>
@@ -167,7 +167,7 @@ flowchart TD
 2. **🔎 Investigate** and state the root cause (`file:line` + blast radius).
 3. **✂️ Fix** with the smallest possible change.
 4. **✅ Verify** everything's green.
-5. **🚢 Ship** a PR with the root cause and evidence.
+5. **🚢 Ship** — you approve the fix, then it's committed and PR'd with the root cause and evidence.
 
 </details>
 
@@ -198,12 +198,13 @@ you ▸ /feature "add a wishlist screen"
 🔨 Build
    ├─ writes failing tests first (store · mapper · hook)
    ├─ builds the screen on the tech-DNA data pipeline
-   └─ commits in small slices
+   └─ keeps the change uncommitted for your review
 
 🧪 QA & Verify
    ├─ lint ✓   typecheck ✓   tests ✓  (12 passed)
-   ├─ drives the app, screenshots every state .......... ✋ you skim
-   └─ fresh-eyes review pass
+   ├─ drives the app, screenshots every state
+   ├─ fresh-eyes review pass
+   └─ shows you the change ........................... ✋ you approve → commit
 
 🚢 Ship
    └─ opens a PR with plan + tests + screenshots ........ ✋ you review
@@ -238,7 +239,9 @@ You never call these; they just happen in the background:
 
 ### 🧬 The tech-DNA
 
-The heart of it all — `docs/tech-dna.md`, a genome of copy-me patterns covering the data pipeline, state, styling, navigation, testing, and error handling. Ships as a **uniform baseline** (identical everywhere) with `<FILL IN>` slots for your specifics. Devs extend it as the project grows — that's expected, not cheating. 🌱
+The heart of it all — `docs/tech-dna.md`, a genome of copy-me patterns: the data pipeline (timeouts, envelopes, contracts), state & storage (MMKV encryption, persisted-store versioning), styling, Figma precision, navigation & deep links, performance (images, animation, video, memory), config, errors, tests, plus cross-cutting **security, auth & session, permissions, SDKs, app lifecycle, release & native config, analytics & privacy**, a release checklist, and an index of **failures that are silent** (no error, no failing test). `CLAUDE.md` carries the hard rules and the top silent traps.
+
+Ships as a **uniform baseline** (identical everywhere) with `<FILL IN>` slots for your specifics. Core libraries (Reanimated, gesture-handler, safe-area, keyboard-controller, keychain, …) are hard rules; optional integrations (video, WebView, remote config, crash reporting, analytics, OTA) are marked _"If your app uses X"_. Devs extend it as the project grows — that's expected, not cheating. 🌱
 
 ---
 
