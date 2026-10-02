@@ -150,7 +150,7 @@ flowchart TD
 
 <br/>
 
-1. **📋 Plan** — explores your code, pulls Figma specs, asks *all* its questions at once, writes a plan + spec. → **you approve** ✋
+1. **📋 Plan** — explores your code, pulls Figma specs, asks its questions **one at a time, with options**, writes the feature's `spec.md` + `build.md`. → **you approve** ✋
 2. **🔨 Build** — tests-first where there's logic, follows the tech-DNA. **Nothing is committed yet.**
 3. **🧪 QA & Verify** — lint (`--max-warnings=0`) + types + tests, drives the real app, screenshots each state. → **you approve the change — only then is it committed** ✋
 4. **🚢 Ship** — pushes and opens the PR (docs included). → **you review** ✋
@@ -180,7 +180,7 @@ The setup command from Quick Start step 3. Completely safe — it only **adds** 
 
 </details>
 
-> Both `/feature` and `/fix` **stop and ask** whenever something's unclear, and build *exactly* to your answer — they never guess. 🙌
+> Both `/feature` and `/fix` **stop and ask** whenever something's unclear — one question at a time, each with options — and build *exactly* to your answer. They never guess, and they write nothing without your OK. 🙌
 
 <details>
 <summary><b>🎬 What a <code>/feature</code> session actually feels like</b></summary>
@@ -193,7 +193,8 @@ you ▸ /feature "add a wishlist screen"
 📋 Plan
    ├─ explores your code, reuses ProductCard + existing query patterns
    ├─ pulls the Figma node specs (exact spacing, colors → theme tokens)
-   └─ asks 3 questions in one batch ..................... ✋ you approve
+   ├─ asks 3 questions, one at a time, with options
+   └─ writes docs/modules/<module>/<feature>/spec.md + build.md ✋ you approve
 
 🔨 Build
    ├─ writes failing tests first (store · mapper · hook)
@@ -225,6 +226,7 @@ You never call these; they just happen in the background:
 | ✅ **Test gate** | When a task finishes | Runs changed-file tests — a red suite blocks *done* |
 | 🚧 **Native guard** | Before editing `ios/` / `android/` / generated files | Asks you to confirm — those edits are usually mistakes |
 | 💡 **Learn nudge** | After a failed build/test | Suggests saving a non-obvious fix so it's never re-found |
+| 📂 **Doc check** | When a task finishes | If feature docs changed, checks their format — a messy doc blocks *done* |
 
 ➕ Destructive git (`push --force`, `reset --hard`, `clean -f`) is blocked, and `.env` edits ask first.
 
@@ -235,6 +237,7 @@ You never call these; they just happen in the background:
 
 - **`figma-to-ui`** — turn a Figma node into React Native UI that follows your tech-DNA. Give it a Figma link + a screenshot.
 - **`graphify`** — build a searchable knowledge graph of your codebase, so *"how does X work?"* is a fast query, not a grep marathon.
+- **`doc`** — one folder per feature in `docs/modules/<module>/<feature>/`: `spec.md` (every question asked + your answer, every decision with **who decided, who approved, when**, requirements, edge cases, bugs fixed, changelog) and `build.md` (design, files, testIDs, plan, verification). `/doc:new`, `/doc:update`, `/doc:check`; `/feature` and `/fix` use it automatically.
 - **`store-submit`** — verify an App Store Connect *and* Play Console submission against your actual code. `/store-submit` does both; scope it with `:ios` / `:android`. → [full section below](#-shipping--store-submit)
 
 ### 🧬 The tech-DNA
@@ -494,9 +497,9 @@ rn-dev-workflow/
 │   └── marketplace.json          # declares this marketplace + the plugin
 └── plugins/rn-workflow/
     ├── .claude-plugin/plugin.json  # the plugin manifest
-    ├── commands/                   # /feature, /fix, /init-dna, /store-submit(:ios|:android)
+    ├── commands/                   # /feature, /fix, /init-dna, /doc:(new|update|check), /store-submit(:ios|:android)
     ├── hooks/                      # the 4 guardrails + hooks.json
-    ├── skills/                     # figma-to-ui, graphify, store-submit
+    ├── skills/                     # figma-to-ui, graphify, doc, store-submit
     └── scaffold/                   # ← what /init-dna copies into your project
         ├── CLAUDE.md
         ├── settings.snippet.json
@@ -504,7 +507,7 @@ rn-dev-workflow/
             ├── tech-dna.md
             ├── decisions/          # ADR template + index
             ├── architecture/       # subsystem docs + the AI-workflow guide
-            ├── superpowers/        # plan + spec templates
+            ├── modules/            # feature docs: <module>/<feature>/spec.md + build.md
             ├── runbooks/
             └── glossary.md
 ```

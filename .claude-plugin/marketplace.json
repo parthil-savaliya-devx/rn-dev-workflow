@@ -8,8 +8,8 @@
     {
       "name": "rn-workflow",
       "source": "./plugins/rn-workflow",
-      "description": "React Native AI dev workflow \u2014 /feature + /fix commands, guardrail hooks (protect-native, post-edit eslint, stop-test, auto-learn), figma-to-ui + graphify + store-submit skills, and /init-dna to scaffold the tech-DNA docs into a project.",
-      "version": "0.6.1",
+      "description": "React Native AI dev workflow — /feature + /fix commands, /doc feature docs, guardrail hooks (protect-native, post-edit eslint, stop-test, doc-check, auto-learn), figma-to-ui + graphify + doc + store-submit skills, and /init-dna to scaffold the tech-DNA docs into a project.",
+      "version": "0.7.0",
       "author": {
         "name": "parthil-savaliya-devx"
       }

@@ -14,7 +14,7 @@ You are fixing a bug. Follow these steps strictly — do not skip, do not add pl
 
 - Check your persistent memory + recalled `<system-reminder>` context for a matching prior fix/gotcha before diagnosing — and the silent-failure index (`CLAUDE.md` → Traps, tech-dna §29): many "it just doesn't work" bugs are a known trap.
 - State the root cause in one paragraph: `file:line`, why it happens, and blast radius (what else this code touches). If a `graphify-out/` graph exists, prefer `graphify query`/`graphify path` over broad grep to map the blast radius.
-- If the hypothesis is uncertain — or the **expected** behaviour itself is unclear — STOP and ask the user (one batched round). Implement only after they confirm, and exactly per the clarification. Never guess and fix.
+- If the hypothesis is uncertain — or the **expected** behaviour itself is unclear — STOP and ask the user — **one question at a time, with options** (recommended first). Implement only after they confirm, and exactly per the clarification. Never guess and fix.
 
 ## 3. FIX (minimal diff)
 
@@ -32,6 +32,7 @@ You are fixing a bug. Follow these steps strictly — do not skip, do not add pl
 
 ## 5. SHIP
 
+- **Record the fix in the feature's docs** with the `doc` skill: a row in that feature's `docs/modules/<module>/<feature>/spec.md` → **6. Bugs fixed** (what broke, root cause, fix, Decided by = `git config user.name`, Approved by — asked, with git names as options — date, PR) plus a Changelog row. Show the rows and write only after the developer confirms. If the feature has no docs yet, ask whether to create them (`/doc:new`) or record the fix in the PR only.
 - If a decision/pattern changed as part of the fix, update `docs/` in the same change set (tech-dna — Documentation) — an ADR for a reversed decision, a `docs/tech-dna.md` addition for a new pattern, a `CLAUDE.md` → Traps line for a new silent failure.
 - **Present before committing** (tech-dna — Human verification precedes every commit): the root-cause paragraph, the uncommitted diff, the repro test (red → green), evidence (before/after screenshots for visual bugs) and the sibling-sweep result. **Wait for explicit approval**; fold requested changes into the same uncommitted set and present again.
 - On approval, commit (conventional commit). Push and open the PR only when asked. PR body: **why** (the user-visible problem) and the root-cause paragraph, repro test name, evidence, sibling-sweep result. End with the repo's required trailer (see `CLAUDE.md`).
@@ -41,4 +42,4 @@ You are fixing a bug. Follow these steps strictly — do not skip, do not add pl
 - Non-obvious root cause → save to persistent memory so it's never rediscovered.
 - Recurring or easy-to-repeat mistake → propose a **hookify** rule (`/hookify`) to prevent the class mechanically.
 
-**Hard rules:** no product-code edits before a repro exists · anything unclear (expected behaviour, root cause, scope) → ASK the human first and implement only after — and exactly per — their clarification · no plan/spec files for a fix · the repro test is never deleted · minimal diff, no drive-by refactors · no commit before the human approves the fix · evidence in the PR or it didn't happen.
+**Hard rules:** no product-code edits before a repro exists · anything unclear (expected behaviour, root cause, scope) → ASK the human first, one question at a time with options, and implement only after — and exactly per — their clarification · no new plan/spec files for a fix — the fix is a row in the feature's existing spec · the repro test is never deleted · minimal diff, no drive-by refactors · no commit before the human approves the fix · evidence in the PR or it didn't happen.

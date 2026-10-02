@@ -2,7 +2,7 @@
 description: 'Scaffold the tech-DNA docs (CLAUDE.md + docs/) and settings into the current project.'
 ---
 
-You are scaffolding the **rn-workflow tech-DNA** into the current project. The plugin ships the *machinery* (the `/feature`, `/fix` commands, the guardrail hooks, the `figma-to-ui` + `graphify` skills) — those are already active once the plugin is installed. This command copies in the *editable content* the project must own: `CLAUDE.md`, the `docs/` tree, and the project-level settings snippet.
+You are scaffolding the **rn-workflow tech-DNA** into the current project. The plugin ships the *machinery* (the `/feature`, `/fix` commands, the guardrail hooks, the `figma-to-ui`, `graphify`, `doc` and `store-submit` skills) — those are already active once the plugin is installed. This command copies in the *editable content* the project must own: `CLAUDE.md`, the `docs/` tree, and the project-level settings snippet.
 
 **Golden rule: never clobber.** This project may already have a `CLAUDE.md`, a `docs/` tree, or a `.claude/settings.json`. Copy-if-absent; for anything that already exists, report it and ask before overwriting or merging. The scaffold is a *starting point*, not a reset.
 
@@ -75,7 +75,7 @@ node -e "console.log(JSON.stringify(require('./package.json').scripts || {}, nul
 ls yarn.lock package-lock.json pnpm-lock.yaml bun.lockb 2>/dev/null
 ```
 
-For each canonical command, find the project's equivalent (for example `check-env` for `check:env`, or `ios` / `ios-uat` for `ios:dev`). Show the user the mapping and ask once, in one batched question, which they want:
+For each canonical command, find the project's equivalent (for example `check-env` for `check:env`, or `ios` / `ios-uat` for `ios:dev`). Show the user the mapping, then ask — one question at a time, with options — which they want:
 
 - **(a) Add alias scripts** to `package.json` (e.g. `"check:env": "yarn check-env"`), as a careful read-merge-write that never changes or removes an existing script; or
 - **(b) Keep the project's own names**, and write them into the `CLAUDE.md` → **Commands** block in place of the defaults.
@@ -94,7 +94,7 @@ grep -rn "FILL IN" ./CLAUDE.md ./docs 2>/dev/null || echo "no FILL IN markers fo
 
 Tell the user, in this order:
 
-1. **The machinery is already live** — `/rn-workflow:feature`, `/rn-workflow:fix`, the hooks, and the `figma-to-ui` / `graphify` skills work now (the plugin is installed).
+1. **The machinery is already live** — `/rn-workflow:feature`, `/rn-workflow:fix`, the hooks, and the `figma-to-ui` / `graphify` / `doc` skills work now (the plugin is installed). Feature docs go in `docs/modules/` — `/feature` writes them, or start one with `/doc:new <module> <feature>`.
 2. **Fill the `<FILL IN>` slots** in `docs/tech-dna.md` and `CLAUDE.md` — the backend boundary, env keys, subsystem map, brand tokens, and any project-specific rules. The RN best-practice rules are already written; you tighten the project-specific parts.
 3. **Commands are mapped** — say which option from step 5 was applied (aliases added, or the project's names written into `CLAUDE.md` → Commands). The hooks use the project's local `eslint` / `jest` and no-op safely if either isn't installed.
 4. **Set up the doc index files** — `docs/decisions/README.md` and `docs/architecture/README.md` are seeded; add rows as you write ADRs / architecture docs.

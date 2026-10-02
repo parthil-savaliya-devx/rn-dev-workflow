@@ -15,7 +15,8 @@ The machinery (commands, hooks, skills) is installed from the **`rn-workflow` pl
 | **`/feature`** | `rn-workflow` plugin | End-to-end feature workflow: Plan → Build → QA & Verify → Ship → Compound, with three human gates. |
 | **`/fix`** | `rn-workflow` plugin | Bugfix workflow: repro-first → minimal diff → verify → PR. No feature ceremony. |
 | **Hooks** | `rn-workflow` plugin | Automatic guardrails the harness runs around tool calls (below). |
-| **Skills** | `rn-workflow` plugin | `figma-to-ui` (design → RN UI on the tech-DNA patterns) + `graphify` (codebase knowledge graph). |
+| **Skills** | `rn-workflow` plugin | `figma-to-ui` (design → RN UI on the tech-DNA patterns), `graphify` (codebase knowledge graph), `doc` (feature docs) and `store-submit` (store submission review). |
+| **Feature docs** | `docs/modules/` (owned here) | One folder per feature: `spec.md` (questions & answers, decisions with who decided / approved / when, requirements, edge cases, bugs fixed, changelog) + `build.md` (design values, files, testIDs, plan, verification). Written by `/feature`, `/fix` and `/doc:new` · `/doc:update` · `/doc:check`. |
 | **Settings** | `.claude/settings.json` (owned here) | Denies destructive git + asks before `.env` edits (merged in by `/init-dna`). |
 | **Memory + hookify** | Claude memory · `/hookify` | Where non-obvious discoveries and recurring-mistake preventions are captured. |
 
@@ -29,7 +30,7 @@ Every feature and every bugfix is written by **copying the patterns in `docs/tec
 
 Run `/feature "<name>"` to build a feature in one session:
 
-1. **Plan** — explore read-only, pull Figma node specs (via the `figma-to-ui` skill), get the contract, ask all clarifying questions in one batch, and persist two docs: a task plan at `docs/superpowers/plans/YYYY-MM-DD-<feature>.md` and a rebuild-grade spec at `docs/superpowers/specs/YYYY-MM-DD-<feature>-design.md`. **▸ Gate A: plan approval.**
+1. **Plan** — explore read-only, pull Figma node specs (via the `figma-to-ui` skill), get the contract, ask the clarifying questions **one at a time, each with options**, and persist the feature's docs with the `doc` skill: `docs/modules/<module>/<feature>/spec.md` (what & why) + `build.md` (how). **▸ Gate A: spec approval** — the approver's name is recorded and the status becomes Approved.
 2. **Build** — logic-first TDD; the data path through the pipeline; token-only UI; a `testID` on every interactive/landmark element. **Nothing is committed** — the change stays uncommitted until Gate B.
 3. **QA & Verify** (feature-scoped) — Jest+RTL branch/interaction tests, a green `yarn lint --max-warnings=0 && yarn typecheck && yarn test && yarn check:env`, driving the real app with a screenshot per designed state, a fresh-eyes review, and the docs diff. Device e2e is ask-first, scoped to the one feature spec, never automatic. **▸ Gate B: QA report + change approval — the commit gate.** The change is committed only after you approve it.
 4. **Ship** — after Gate B: push and open the PR with the evidence bundle. **▸ Gate C: PR review.**
@@ -37,9 +38,9 @@ Run `/feature "<name>"` to build a feature in one session:
 
 ### `/fix` — repro-first, minimal diff
 
-Run `/fix "<bug>"`: write a **failing test that captures the bug first** (no product-code edits before a repro exists), state the root cause with `file:line` + blast radius, make the smallest change that turns it green, sweep for sibling occurrences, verify with the green bar (lint `--max-warnings=0` + typecheck + jest), **present the uncommitted fix and commit only after you approve it**, then open a PR whose body carries the root-cause paragraph + repro test name. The repro test stays in the suite forever.
+Run `/fix "<bug>"`: write a **failing test that captures the bug first** (no product-code edits before a repro exists), state the root cause with `file:line` + blast radius, make the smallest change that turns it green, sweep for sibling occurrences, verify with the green bar (lint `--max-warnings=0` + typecheck + jest), **present the uncommitted fix and commit only after you approve it**, record the fix in the feature's spec → Bugs fixed (who decided, who approved, when), then open a PR whose body carries the root-cause paragraph + repro test name. The repro test stays in the suite forever.
 
-**Both commands stop and ask on any ambiguity** and build only to the clarification — never guess-and-build.
+**Both commands stop and ask on any ambiguity** — one question at a time, with options — and build only to the answer. Nothing is written without the developer's confirmation.
 
 ### Hooks — the automatic guardrails
 
@@ -50,6 +51,7 @@ Declared in the plugin's `hooks/hooks.json`, run by the harness around tool call
 | `protect-native.sh` | PreToolUse (Edit/Write) | Asks for confirmation before editing `ios/`, `android/`, or generated `graphify-out/`. |
 | `post-edit.sh` | PostToolUse (Edit/Write) | Runs the project's local `eslint --fix` on the edited source file; a residual error feeds back. |
 | `stop-test.sh` | Stop | Runs the project's local `jest --onlyChanged` (with `--forceExit` and a 2-worker / 512 MB cap) when a turn ends; a red suite blocks completion. |
+| `doc-check.sh` | Stop | When feature docs in `docs/modules/` changed, checks their format (both files, every section, unique IDs, who/when on every decision, index in sync); a problem blocks finishing. |
 | `auto-learn.sh` | PostToolUseFailure + PostToolUse (Bash) | When lint / typecheck / tests / the env check / a native build fails (any package manager, `check:env` or `check-env`), and after a commit, nudges Claude to capture a non-obvious fix in memory or a `/hookify` rule. |
 
 `.claude/settings.json` also **denies** destructive git (`push --force`, `reset --hard`, `clean -f`) and **asks** before any `.env*` edit.

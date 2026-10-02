@@ -50,7 +50,7 @@ The skill never silently assumes anything it is not certain about. On any of the
 - An ambiguous wire-shape or data field
 - An unstated track or backend mode
 
-…the skill **pauses and asks the user a focused, specific question** before proceeding.
+…the skill **pauses and asks the user a focused, specific question** before proceeding — **one question at a time**, as a single `AskUserQuestion` with 2–4 options (recommended first), waiting for each answer before the next. Never a list of questions at once. Answers and decisions are recorded in the feature's `spec.md` with the `doc` skill when the work belongs to a feature.
 
 Token gaps (Figma values with no matching theme token) and provisional-wire uncertainties
 are raised as explicit questions during the work — they are not buried in the final summary.
@@ -240,7 +240,8 @@ registry, and their tests do not change. That is the firewall.
    - **Token gaps** — any Figma value that had no matching theme token, and what was done.
    - **Provisional-wire flags** — all files carrying the `PROVISIONAL` banner, to be
      reconciled when the real contract lands.
-6. Docs updated proportionally:
+6. Docs updated proportionally (and only after the developer confirms):
+   - Work for a feature → its `docs/modules/<module>/<feature>/build.md` (design values with node ids, files, testIDs) and `spec.md` (questions, decisions) via the `doc` skill.
    - New screen → add or update the relevant section in `docs/architecture/`.
    - New reusable pattern or significant decision → new ADR under `docs/decisions/`.
    - No new screen or decision-level change → no doc update required.

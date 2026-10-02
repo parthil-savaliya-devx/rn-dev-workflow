@@ -691,6 +691,7 @@ Figma-sourced UI is built from **node specs, never screenshots**. Before impleme
 Update `docs/` in the same PR as the code — a reviewer reads the docs diff alongside the code diff.
 
 - **New decision** (library, pattern, trade-off) → new ADR under `docs/decisions/`, linked from `decisions/README.md`. **Check the highest ADR number on the base branch first** — parallel branches pick the same number.
+- **New feature** → its folder `docs/modules/<module>/<feature>/` with `spec.md` + `build.md`, written with the `doc` skill: every question asked one at a time with options, the developer's answers in their own words, every decision with who decided / who approved / when, requirements with proof, edge cases. **A bug fix** → a row in that feature's spec → Bugs fixed. Feature decisions live in the feature's spec; only app-wide decisions become ADRs.
 - **New module / screen / subsystem** → add/update `docs/architecture/`. Each architecture doc covers: what it is, how it works, where the code lives, gotchas, related decisions.
 - **New env key** → the environments doc + `.env.example`.
 - **New domain term** → `docs/glossary.md`. **Operational procedure** → a runbook under `docs/runbooks/`.

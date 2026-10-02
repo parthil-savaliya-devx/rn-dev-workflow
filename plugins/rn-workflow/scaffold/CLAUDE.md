@@ -15,7 +15,8 @@ Where to look: **patterns/how-to** → tech-dna · **why a choice was made** →
 - **One data boundary.** Every read/write goes through the single boundary fetcher (`<FILL IN — your client>`) → Zod → mapper → view-model. Never call a third party directly. Every request has a timeout, is authenticated by default (`skipAuth` for public/auth calls), and never puts a query string into an error (dna §3, §23).
 - **Every fetch passes a Zod schema** (`z.unknown()` is the only, review-visible opt-out) that declares only the fields the app reads. The **mapper is the firewall** — wire→view-model transforms live there, declared as a `type→fn` map, **never a `switch`**.
 - **Config-driven, never name-driven** rendering. Branch layout on config flags via the shared `SectionList` + per-screen `SectionRegistry` (O(1) map dispatch); `kind === wire type`.
-- **Ask, don't assume.** Anything unclear — requirement, design intent, API behaviour, edge case — STOP and ask the human (batched), and build exactly to the clarification. Never guess and build.
+- **Ask, don't assume.** Anything unclear — requirement, design intent, API behaviour, edge case — STOP and ask the human, **one question at a time, each with options** (recommended first), waiting for each answer before the next. Build exactly to the answer. Never guess and build.
+- **Nothing without the developer's confirmation.** No doc, decision or code change is written until the developer has seen it and said yes. Every decision is recorded in the feature's `spec.md` with **who decided** (git name), **who approved** (asked) and **when** (`doc` skill).
 - **Human verification precedes every commit** (dna §17a). Change → green bar → drive the real app → present and wait → commit on approval → push only when the whole change is approved. Never commit as you go.
 - **Figma from node specs, never screenshots** (dna §9) — `get_metadata` → `get_design_context`, exact values, cite the node id in a comment (use the `figma-to-ui` skill). Never substitute the "nearest" token when the value differs.
 - **Styling** (dna §8): theme tokens first; **hex only** (`#RRGGBB`/`#RRGGBBAA`, `withAlpha`); `spacing.*` + `typography.*` tokens (no scaling helpers); **weight-by-family, never `fontWeight`**; prefer `BaseText`; no inline `style={{}}`; no anonymous fns in JSX props (except per-iteration list closures). A colour literal in a screen/component is a defect — add a token.
@@ -144,7 +145,7 @@ Every folder has a barrel `index.ts`. Full anatomy: [`docs/tech-dna.md`](docs/te
 
 ## Documentation
 
-Docs ship in the PR (tech-dna §15): new decision → an ADR (`docs/decisions/` — check the highest number on the base branch first); new subsystem → `docs/architecture/`; new env key → the environments doc + `.env.example`; new term → `docs/glossary.md`; new pattern → `docs/tech-dna.md`; new silent failure → a line in **Traps** above.
+Docs ship in the PR (tech-dna §15): **new feature → `docs/modules/<module>/<feature>/spec.md` + `build.md`** (`doc` skill — `/doc:new`, `/doc:update`, `/doc:check`); **bug fix → a row in that feature's spec → Bugs fixed**; app-wide decision → an ADR (`docs/decisions/` — check the highest number on the base branch first); new subsystem → `docs/architecture/`; new env key → the environments doc + `.env.example`; new term → `docs/glossary.md`; new pattern → `docs/tech-dna.md`; new silent failure → a line in **Traps** above.
 
 ## Tooling
 
