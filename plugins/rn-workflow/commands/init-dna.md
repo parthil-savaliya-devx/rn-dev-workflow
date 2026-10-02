@@ -62,6 +62,19 @@ fi
 
 Do this as a careful read-merge-write (you are executing this, so use `node`/`jq` or read+edit) — never overwrite an existing settings file wholesale.
 
+**Check for a second copy of the workflow hooks.** A repo set up before it used the plugin may wire its own copies in `.claude/settings.json` (or `settings.local.json`):
+
+```bash
+grep -n -E "hooks/(protect-native|post-edit|stop-test|doc-check|auto-learn)\.sh" .claude/settings.json .claude/settings.local.json 2>/dev/null
+```
+
+If any match, the plugin's copy of that hook steps aside (so a check never runs twice), and the project's copy runs instead — without the plugin's memory cap, time limit and one-at-a-time lock, which is what lets jest / eslint freeze a machine. Show the user the matching hook entries and ask **one** question:
+
+- **Remove the project's copies (Recommended)** — delete just those hook entries from `settings.json` so the plugin's bounded hooks run. Keep every other hook and key; leave the `.claude/hooks/*.sh` files on disk unless the user also asks to delete them.
+- **Keep the project's copies** — change nothing; the plugin's copies stay out of the way.
+
+Never change the hooks block without that answer. Show the before/after of the `hooks` block.
+
 ### 4. If `CLAUDE.md` already existed
 
 Don't overwrite it. Instead, open `${CLAUDE_PLUGIN_ROOT}/scaffold/CLAUDE.md`, and propose merging its **Hard Rules** index and the **link to `docs/tech-dna.md`** into the project's existing `CLAUDE.md` — show the diff and let the user approve. The rest of their `CLAUDE.md` (subsystem map, project specifics) stays as-is.

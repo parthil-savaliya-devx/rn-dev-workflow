@@ -12,6 +12,11 @@
 # Script names are matched loosely: yarn / npm run / pnpm / bun, and both
 # `check:env` and `check-env`.
 
+# Skipped when the project wires its own copy of this hook (never nudge twice).
+# shellcheck source=lib/common.sh
+. "$(dirname "$0")/lib/common.sh"
+project_has_own_hook auto-learn.sh && exit 0
+
 INPUT=$(cat)
 read_field() {
   printf '%s' "$INPUT" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const o=JSON.parse(d);const v=$1;process.stdout.write(v==null?'':String(v))}catch(e){}})"

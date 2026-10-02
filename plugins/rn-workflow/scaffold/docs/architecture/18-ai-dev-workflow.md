@@ -49,10 +49,18 @@ Declared in the plugin's `hooks/hooks.json`, run by the harness around tool call
 | Hook | Event | What it does |
 | ---- | ----- | ------------ |
 | `protect-native.sh` | PreToolUse (Edit/Write) | Asks for confirmation before editing `ios/`, `android/`, or generated `graphify-out/`. |
-| `post-edit.sh` | PostToolUse (Edit/Write) | Runs the project's local `eslint --fix` on the edited source file; a residual error feeds back. |
-| `stop-test.sh` | Stop | Runs the project's local `jest --onlyChanged` (with `--forceExit` and a 2-worker / 512 MB cap) when a turn ends; a red suite blocks completion. |
+| `post-edit.sh` | PostToolUse (Edit/Write) | Runs the project's local `eslint --fix` on the edited source file; a residual error feeds back. One run at a time — parallel edits queue (up to 30 s, else skip); stopped after 60 s. |
+| `stop-test.sh` | Stop | Runs the project's local `jest --onlyChanged --bail` (2 workers, recycled above 512 MB) when a turn ends; a red suite blocks completion. Skipped when nothing changed since the last green run; stopped after 240 s. |
 | `doc-check.sh` | Stop | When feature docs in `docs/modules/` changed, checks their format (both files, every section, unique IDs, who/when on every decision, index in sync); a problem blocks finishing. |
 | `auto-learn.sh` | PostToolUseFailure + PostToolUse (Bash) | When lint / typecheck / tests / the env check / a native build fails (any package manager, `check:env` or `check-env`), and after a commit, nudges Claude to capture a non-obvious fix in memory or a `/hookify` rule. |
+
+**Built so they can't freeze the machine** — even when the code is broken (an infinite render loop, runaway recursion). The heavy hooks (eslint, jest) go through `hooks/lib/run-bounded.mjs`, which:
+
+- runs one copy at a time per project, so parallel edits or back-to-back turns never stack jest / eslint runs;
+- caps each Node process's heap (`RN_WORKFLOW_NODE_MAX_MB`, default 2048), so a runaway crashes one worker with "heap out of memory" instead of eating all RAM;
+- stops the command on its own time limit (below the hook's), and kills its **whole** process tree — on timeout, on cancel, or if the hook itself is killed — so no worker is left running in the background.
+
+If the project wires its **own** copy of one of these hooks in `.claude/settings.json`, the plugin's copy steps aside, so the same check never runs twice. Override the jest flags with `RN_WORKFLOW_JEST_ARGS`.
 
 `.claude/settings.json` also **denies** destructive git (`push --force`, `reset --hard`, `clean -f`) and **asks** before any `.env*` edit.
 

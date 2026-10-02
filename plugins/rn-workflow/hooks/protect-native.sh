@@ -3,6 +3,11 @@
 # user confirmation. Native code is out of the normal RN-app change surface;
 # a stray edit there is almost always a mistake. graphify-out/ is regenerated
 # (AST rebuild via husky) and must never be hand-edited either.
+# Skipped when the project wires its own copy of this hook (never ask twice).
+# shellcheck source=lib/common.sh
+. "$(dirname "$0")/lib/common.sh"
+project_has_own_hook protect-native.sh && exit 0
+
 INPUT=$(cat)
 FILE=$(printf '%s' "$INPUT" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{process.stdout.write(JSON.parse(d).tool_input.file_path||'')}catch(e){}})")
 [ -z "$FILE" ] && exit 0

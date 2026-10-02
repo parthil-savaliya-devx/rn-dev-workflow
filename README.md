@@ -233,6 +233,9 @@ You never call these; they just happen in the background:
 > [!NOTE]
 > The hooks run your project's own `eslint` and `jest` (from `node_modules/.bin`), so they work with yarn, npm or pnpm. No `package.json`, or eslint / jest not installed? They **quietly no-op**. `/init-dna` maps the workflow's command names (`lint`, `typecheck`, `test`, `check:env`, `ios:dev`, `android:dev`) to your real scripts.
 
+> [!TIP]
+> **The hooks can't freeze your machine**, even on broken code. eslint and jest run one at a time, with a memory cap and a time limit, and when they're stopped *every* process they started is killed too. Tests are skipped when nothing changed since the last green run.
+
 ### 🎨 The skills
 
 - **`figma-to-ui`** — turn a Figma node into React Native UI that follows your tech-DNA. Give it a Figma link + a screenshot.
@@ -498,7 +501,7 @@ rn-dev-workflow/
 └── plugins/rn-workflow/
     ├── .claude-plugin/plugin.json  # the plugin manifest
     ├── commands/                   # /feature, /fix, /init-dna, /doc:(new|update|check), /store-submit(:ios|:android)
-    ├── hooks/                      # the 4 guardrails + hooks.json
+    ├── hooks/                      # the 5 guardrails + hooks.json; lib/ = the bounded runner (lock · memory cap · tree kill)
     ├── skills/                     # figma-to-ui, graphify, doc, store-submit
     └── scaffold/                   # ← what /init-dna copies into your project
         ├── CLAUDE.md
@@ -535,7 +538,20 @@ Make sure both steps ran: <code>/plugin marketplace add …</code> <em>then</em>
 
 <details>
 <summary><b>The hooks don't seem to do anything.</b></summary><br/>
-They use your project's local <code>eslint</code> and <code>jest</code> (<code>node_modules/.bin</code>). If those aren't installed, or there's no <code>package.json</code>, they safely no-op.
+They use your project's local <code>eslint</code> and <code>jest</code> (<code>node_modules/.bin</code>). If those aren't installed, or there's no <code>package.json</code>, they safely no-op. They also step aside when your project wires its <em>own</em> copy of the same hook in <code>.claude/settings.json</code>, so a check never runs twice.
+</details>
+
+<details>
+<summary><b>My machine slowed down or froze while a hook ran.</b></summary><br/>
+
+Since **v0.7.1** the hooks are built so this can't happen. Update first: `/plugin marketplace update rn-dev-workflow`. Then:
+
+- **Check for a second copy.** If your repo's `.claude/settings.json` also wires `stop-test.sh` / `post-edit.sh` (a repo set up before the plugin), jest and eslint ran **twice**. The plugin now steps aside for them, but the old copies aren't memory-capped. `/init-dna` finds them and offers to remove them.
+- **Lower the cap on small machines.** Each jest / eslint process is capped at 2048 MB. Set `RN_WORKFLOW_NODE_MAX_MB=1024` in your shell or in the `env` block of `.claude/settings.json`.
+- **Tune jest.** Replace the default flags (`--bail --forceExit --maxWorkers=2 --workerIdleMemoryLimit=512MB`) with `RN_WORKFLOW_JEST_ARGS`.
+
+When tests hit the cap, the hook says so. That usually means an infinite render loop or runaway recursion in the code that just changed.
+
 </details>
 
 <details>
