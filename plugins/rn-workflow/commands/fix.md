@@ -2,7 +2,7 @@
 description: 'Bugfix workflow — repro-first, minimal fix, regression test, PR. No feature ceremony.'
 ---
 
-You are fixing a bug. Follow these steps strictly — do not skip, do not add planning documents. Project commands: `yarn lint --max-warnings=0`, `yarn typecheck`, `yarn test`, `yarn check:env` (read `package.json` if this project's scripts differ).
+You are fixing a bug. Follow these steps strictly — do not skip, do not add planning documents. Project commands: use the ones in `CLAUDE.md` → **Commands** (defaults: `yarn lint --max-warnings=0`, `yarn typecheck`, `yarn test`, `yarn check:env`). If `CLAUDE.md` doesn't list them, read `package.json` — never guess a script name.
 
 ## 1. REPRODUCE (mandatory — before touching any product code)
 

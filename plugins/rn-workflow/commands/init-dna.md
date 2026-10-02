@@ -66,7 +66,25 @@ Do this as a careful read-merge-write (you are executing this, so use `node`/`jq
 
 Don't overwrite it. Instead, open `${CLAUDE_PLUGIN_ROOT}/scaffold/CLAUDE.md`, and propose merging its **Hard Rules** index and the **link to `docs/tech-dna.md`** into the project's existing `CLAUDE.md` — show the diff and let the user approve. The rest of their `CLAUDE.md` (subsystem map, project specifics) stays as-is.
 
-### 5. Report + hand off the placeholders
+### 5. Map the project's scripts (never assume names)
+
+The workflow uses six canonical commands: `lint`, `typecheck`, `test`, `check:env`, `ios:dev`, `android:dev`. Read the project's real script names and its package manager:
+
+```bash
+node -e "console.log(JSON.stringify(require('./package.json').scripts || {}, null, 2))" 2>/dev/null || echo "no package.json"
+ls yarn.lock package-lock.json pnpm-lock.yaml bun.lockb 2>/dev/null
+```
+
+For each canonical command, find the project's equivalent (for example `check-env` for `check:env`, or `ios` / `ios-uat` for `ios:dev`). Show the user the mapping and ask once, in one batched question, which they want:
+
+- **(a) Add alias scripts** to `package.json` (e.g. `"check:env": "yarn check-env"`), as a careful read-merge-write that never changes or removes an existing script; or
+- **(b) Keep the project's own names**, and write them into the `CLAUDE.md` → **Commands** block in place of the defaults.
+
+If a command has no equivalent at all (e.g. no `typecheck` script), list it and offer the standard one (`"typecheck": "tsc --noEmit"`). Skip `check:env` if the project has no `.env.*` files. Write every command with the project's package manager (from the lockfile), not `yarn` by default.
+
+The hooks don't depend on these names: they run the project's local `eslint` / `jest` binaries, and the learning hook recognises yarn / npm / pnpm and both `check:env` and `check-env`. This step keeps `/feature`, `/fix` and the docs pointing at commands that really exist.
+
+### 6. Report + hand off the placeholders
 
 Print a summary: files created, files skipped, the settings merge result. Then list the `<FILL IN …>` placeholders the user must complete — grep for them so the list is exact:
 
@@ -78,7 +96,7 @@ Tell the user, in this order:
 
 1. **The machinery is already live** — `/rn-workflow:feature`, `/rn-workflow:fix`, the hooks, and the `figma-to-ui` / `graphify` skills work now (the plugin is installed).
 2. **Fill the `<FILL IN>` slots** in `docs/tech-dna.md` and `CLAUDE.md` — the backend boundary, env keys, subsystem map, brand tokens, and any project-specific rules. The RN best-practice rules are already written; you tighten the project-specific parts.
-3. **Wire the hook commands** — the hooks assume `yarn lint` / `yarn typecheck` / `yarn test` / `yarn check:env`. If this project's scripts differ, either add matching `package.json` scripts or adjust. (The hooks no-op safely if there's no `package.json`.)
+3. **Commands are mapped** — say which option from step 5 was applied (aliases added, or the project's names written into `CLAUDE.md` → Commands). The hooks use the project's local `eslint` / `jest` and no-op safely if either isn't installed.
 4. **Set up the doc index files** — `docs/decisions/README.md` and `docs/architecture/README.md` are seeded; add rows as you write ADRs / architecture docs.
 
 **Do not commit** — leave the scaffold staged for the user to review and commit themselves.

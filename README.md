@@ -229,7 +229,7 @@ You never call these; they just happen in the background:
 ➕ Destructive git (`push --force`, `reset --hard`, `clean -f`) is blocked, and `.env` edits ask first.
 
 > [!NOTE]
-> The hooks expect standard scripts — `yarn lint`, `yarn typecheck`, `yarn test`, `yarn check:env`. No `package.json` or different scripts? The hooks **quietly no-op** (they won't error) — but add those scripts for the full experience.
+> The hooks run your project's own `eslint` and `jest` (from `node_modules/.bin`), so they work with yarn, npm or pnpm. No `package.json`, or eslint / jest not installed? They **quietly no-op**. `/init-dna` maps the workflow's command names (`lint`, `typecheck`, `test`, `check:env`, `ios:dev`, `android:dev`) to your real scripts.
 
 ### 🎨 The skills
 
@@ -532,12 +532,12 @@ Make sure both steps ran: <code>/plugin marketplace add …</code> <em>then</em>
 
 <details>
 <summary><b>The hooks don't seem to do anything.</b></summary><br/>
-They need <code>yarn lint</code> / <code>yarn typecheck</code> / <code>yarn test</code> / <code>yarn check:env</code> scripts in your <code>package.json</code>. No <code>package.json</code>? They safely no-op.
+They use your project's local <code>eslint</code> and <code>jest</code> (<code>node_modules/.bin</code>). If those aren't installed, or there's no <code>package.json</code>, they safely no-op.
 </details>
 
 <details>
 <summary><b>Can I use npm/pnpm instead of yarn?</b></summary><br/>
-The hooks and command text default to <code>yarn</code>. Adjust the scripts in your project (or the hooks) to match your package manager.
+Yes. The hooks call your local <code>eslint</code> / <code>jest</code> directly, so the package manager doesn't matter. <code>/init-dna</code> reads your lockfile and scripts and writes the right commands into <code>CLAUDE.md</code> → Commands (or adds alias scripts, your choice).
 </details>
 
 <details>

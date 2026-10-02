@@ -1,5 +1,5 @@
 {
-  "description": "rn-workflow guardrails: confirm native/generated edits, eslint --fix per edit, nudge learnings on failed commands, block finish on a red changed-file test suite.",
+  "description": "rn-workflow guardrails: confirm native/generated edits, eslint --fix per edit, nudge learnings on failed commands and after commits, block finish on a red changed-file test suite. Uses the project's local eslint/jest, so any package manager works.",
   "hooks": {
     "PreToolUse": [
       {
@@ -23,6 +23,18 @@
           }
         ]
       },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/auto-learn.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
       {
         "matcher": "Bash",
         "hooks": [

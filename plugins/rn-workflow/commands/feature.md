@@ -4,7 +4,7 @@ description: 'Feature workflow — Plan → Build → QA & Verify → Ship → C
 
 You are building a feature end-to-end in this session. Three human gates only: **plan approval (A)**, **QA report + change approval (B) — the commit gate: nothing is committed before it**, **PR review (C)**.
 
-**Read first, every time:** `docs/tech-dna.md` (canonical patterns — all code copies these; §29 indexes the silent failures), `CLAUDE.md` (hard rules, silent traps + subsystem map), and any relevant [ADRs](docs/decisions/README.md). Project commands are `yarn lint --max-warnings=0`, `yarn typecheck`, `yarn test`, `yarn check:env` — never hardcode others; if this project's scripts differ, read `package.json` and use those.
+**Read first, every time:** `docs/tech-dna.md` (canonical patterns — all code copies these; §29 indexes the silent failures), `CLAUDE.md` (hard rules, silent traps + subsystem map), and any relevant [ADRs](docs/decisions/README.md). Project commands: use the ones in `CLAUDE.md` → **Commands** (defaults: `yarn lint --max-warnings=0`, `yarn typecheck`, `yarn test`, `yarn check:env`, `yarn ios:dev` / `yarn android:dev`). If `CLAUDE.md` doesn't list them, read `package.json` and use the real script names and package manager — never guess a script name.
 
 ## PHASE 1 — PLAN (in-session)
 

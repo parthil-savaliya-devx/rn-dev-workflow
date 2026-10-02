@@ -48,9 +48,9 @@ Declared in the plugin's `hooks/hooks.json`, run by the harness around tool call
 | Hook | Event | What it does |
 | ---- | ----- | ------------ |
 | `protect-native.sh` | PreToolUse (Edit/Write) | Asks for confirmation before editing `ios/`, `android/`, or generated `graphify-out/`. |
-| `post-edit.sh` | PostToolUse (Edit/Write) | Runs `eslint --fix` on the edited source file; a residual error feeds back. |
-| `stop-test.sh` | Stop | Runs `jest --onlyChanged` when a turn ends; a red suite blocks completion. |
-| `auto-learn.sh` | PostToolUse (Bash) | On a failed `yarn typecheck/lint/test/check:env` or native build, nudges: capture a non-obvious fix in memory or a `/hookify` rule. |
+| `post-edit.sh` | PostToolUse (Edit/Write) | Runs the project's local `eslint --fix` on the edited source file; a residual error feeds back. |
+| `stop-test.sh` | Stop | Runs the project's local `jest --onlyChanged` (with `--forceExit` and a 2-worker / 512 MB cap) when a turn ends; a red suite blocks completion. |
+| `auto-learn.sh` | PostToolUseFailure + PostToolUse (Bash) | When lint / typecheck / tests / the env check / a native build fails (any package manager, `check:env` or `check-env`), and after a commit, nudges Claude to capture a non-obvious fix in memory or a `/hookify` rule. |
 
 `.claude/settings.json` also **denies** destructive git (`push --force`, `reset --hard`, `clean -f`) and **asks** before any `.env*` edit.
 

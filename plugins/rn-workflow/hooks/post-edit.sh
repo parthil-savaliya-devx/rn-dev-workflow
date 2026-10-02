@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # PostToolUse hook (Edit|Write): eslint --fix the single edited source file.
-# Fast per-edit lint + autofix; a residual lint error feeds back to Claude.
-# Typecheck is deliberately NOT run here (a full `tsc --noEmit` per edit is too
-# slow) — it runs on the Stop hook, husky pre-commit, and manual `yarn typecheck`.
+# Fast per-edit lint + autofix; a residual lint error feeds back to Claude
+# (exit 2 shows stderr to Claude). Typecheck is deliberately NOT run here — a
+# full `tsc --noEmit` per edit is too slow; it runs in the green bar before
+# every commit (`lint --max-warnings=0 && typecheck && test`) and in CI.
 #
+# Runs the project's own eslint binary, so it works with yarn, npm or pnpm.
 # $CLAUDE_PROJECT_DIR is the USER's project (not the plugin). The script is
 # located by the plugin via ${CLAUDE_PLUGIN_ROOT} in hooks.json.
 INPUT=$(cat)
@@ -20,10 +22,12 @@ esac
 
 cd "${CLAUDE_PROJECT_DIR:-.}" || exit 0
 
-# No package.json / eslint in this project — no-op rather than error.
+# No package.json or no local eslint in this project — no-op rather than error.
 [ -f package.json ] || exit 0
+ESLINT=node_modules/.bin/eslint
+[ -x "$ESLINT" ] || exit 0
 
-LINT_OUT=$(yarn --silent eslint --fix "$FILE" 2>&1)
+LINT_OUT=$("$ESLINT" --fix "$FILE" 2>&1)
 if [ $? -ne 0 ]; then
   echo "eslint failed on $FILE:" >&2
   echo "$LINT_OUT" >&2

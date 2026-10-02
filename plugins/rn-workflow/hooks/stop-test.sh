@@ -3,19 +3,30 @@
 # completion so a session never ends green-looking on top of failing tests.
 # --onlyChanged keeps it fast (only tests touching the diff). stop_hook_active
 # guards against a re-trigger loop.
+#
+# Runs the project's own jest binary, so it works with yarn, npm or pnpm.
+# --forceExit: tests that leave open handles (timers, query caches) otherwise
+#   keep jest alive until the hook timeout.
+# --maxWorkers=2 --workerIdleMemoryLimit=512MB: one React Native jest worker
+#   per CPU (~1 GB each) can swap the machine.
+# Override the extra flags with RN_WORKFLOW_JEST_ARGS if a project needs to.
 INPUT=$(cat)
 ACTIVE=$(printf '%s' "$INPUT" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{process.stdout.write(String(JSON.parse(d).stop_hook_active||false))}catch(e){process.stdout.write('false')}})")
 [ "$ACTIVE" = "true" ] && exit 0
 
 cd "${CLAUDE_PROJECT_DIR:-.}" || exit 0
 
-# No package.json — nothing to gate on (non-JS project or bare dir).
+# No package.json or no local jest — nothing to gate on.
 [ -f package.json ] || exit 0
+JEST=node_modules/.bin/jest
+[ -x "$JEST" ] || exit 0
 
 # Nothing changed -> nothing to gate on.
 git diff --quiet HEAD 2>/dev/null && [ -z "$(git ls-files --others --exclude-standard '*.ts' '*.tsx' '*.js' '*.jsx' 2>/dev/null)" ] && exit 0
 
-OUT=$(yarn --silent jest --onlyChanged --passWithNoTests 2>&1)
+EXTRA_ARGS=${RN_WORKFLOW_JEST_ARGS:---forceExit --maxWorkers=2 --workerIdleMemoryLimit=512MB}
+# shellcheck disable=SC2086 # EXTRA_ARGS is a deliberate word-split flag list
+OUT=$("$JEST" --onlyChanged --passWithNoTests $EXTRA_ARGS 2>&1)
 if [ $? -ne 0 ]; then
   echo "Test suite related to changed files is RED — fix before finishing:" >&2
   echo "$OUT" | tail -60 >&2

@@ -72,7 +72,7 @@ No error, no failing test; they surface as "it just doesn't work". The full inde
 
 ## Commands
 
-Use **Yarn Classic** for everything (adjust if this project uses npm/pnpm).
+These are the workflow's canonical command names — `/feature`, `/fix` and the docs use whatever this block says. `/init-dna` maps them to this project's real scripts: if the names differ, it either adds alias scripts or writes the real names here. Defaults assume **Yarn Classic**; replace `yarn` with this project's package manager if it differs.
 
 ```bash
 yarn install                     # install deps (then `cd ios && bundle exec pod install`)
