@@ -2,7 +2,7 @@
 
 ## What this covers
 
-How day-to-day development is done in this repo with an AI coding agent (Claude Code) in a **consistent, reviewable** way: the canonical-patterns "genome", the two workflow commands (`/feature`, `/fix`), the enforcement hooks, and the `figma-to-ui` / `graphify` skills. The goal is that a feature written today and one written in three months read as if the same engineer wrote both — because both were written by copying the same documented patterns rather than improvising.
+How day-to-day development is done in this repo with an AI coding agent (Claude Code) in a **consistent, reviewable** way: the canonical-patterns "genome", the two workflow commands (`/feature`, `/fix`), the feature docs (`docs/modules/`), the enforcement hooks, and the skills (`figma-to-ui`, `graphify`, `doc`, `store-submit`). The goal is that a feature written today and one written in three months read as if the same engineer wrote both — because both were written by copying the same documented patterns rather than improvising.
 
 The machinery (commands, hooks, skills) is installed from the **`rn-workflow` plugin** (private `rn-dev-workflow` marketplace); the editable content (this file, `tech-dna.md`, `CLAUDE.md`, the doc templates) was scaffolded into this repo by `/init-dna` and is owned here. This is the process/tooling map. The patterns themselves live in [`../tech-dna.md`](../tech-dna.md); the non-negotiable rules index lives in [`../../CLAUDE.md`](../../CLAUDE.md) → **Hard Rules**.
 
@@ -38,7 +38,7 @@ Run `/feature "<name>"` to build a feature in one session:
 
 ### `/fix` — repro-first, minimal diff
 
-Run `/fix "<bug>"`: write a **failing test that captures the bug first** (no product-code edits before a repro exists), state the root cause with `file:line` + blast radius, make the smallest change that turns it green, sweep for sibling occurrences, verify with the green bar (lint `--max-warnings=0` + typecheck + jest), **present the uncommitted fix and commit only after you approve it**, record the fix in the feature's spec → Bugs fixed (who decided, who approved, when), then open a PR whose body carries the root-cause paragraph + repro test name. The repro test stays in the suite forever.
+Run `/fix "<bug>"`: write a **failing test that captures the bug first** (no product-code edits before a repro exists), state the root cause with `file:line` + blast radius, make the smallest change that turns it green, sweep for sibling occurrences, verify with the green bar (lint `--max-warnings=0` + typecheck + jest), **present the uncommitted fix and commit only after you approve it**, record the fix in the feature's spec → Bugs fixed (who decided, who approved, when), and — when you ask — push and open a PR whose body carries the root-cause paragraph + repro test name. The repro test stays in the suite forever.
 
 **Both commands stop and ask on any ambiguity** — one question at a time, with options — and build only to the answer. Nothing is written without the developer's confirmation.
 

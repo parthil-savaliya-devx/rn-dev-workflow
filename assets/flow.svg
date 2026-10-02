@@ -40,9 +40,9 @@
 
   <!-- gate labels under gated connectors -->
   <g class="gate" text-anchor="middle">
-    <text x="195" y="104">✓ APPROVE</text>
-    <text x="597" y="104">✓ SKIM</text>
-    <text x="798" y="104">✓ REVIEW</text>
+    <text x="195" y="104">✓ APPROVE SPEC</text>
+    <text x="597" y="104">✓ APPROVE → COMMIT</text>
+    <text x="798" y="104">✓ REVIEW PR</text>
   </g>
 
   <!-- pills -->
